@@ -1,0 +1,59 @@
+.win_btn{
+    border-width: 2px;
+    border-style: outset;
+    border-color: buttonface;
+    border-right-color: #424242;
+    border-bottom-color: #424242;
+    background: silver;
+    color: black;
+    padding: 0 0 4px;
+    border-radius: 1px;
+}
+.win_btn:hover {
+    border: 2px inset #fff;
+    background: silver;
+    color: #424242;
+    box-shadow: -1px -1px #000;
+}
+.win_btn:focus {
+    border: 2px inset #fff !important;
+    background: silver;
+    color: #424242;
+    box-shadow: -1px -1px #000 !important;
+    outline: 0 !important;
+    background: url(background.bmp);
+}
+.win_btn:active {
+    border: 2px inset #fff !important;
+    color: #424242;
+    box-shadow: -1px -1px #000 !important;
+    outline: 0 !important;
+    background: url(background.bmp);
+}
+
+button:focus{
+    outline: 1px dotted;
+}
+
+.win_card-header{
+    background: -webkit-linear-gradient(left,#08216b,#a5cef7);
+    color: #fff;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-top: 2px;
+    padding-bottom: 1px;
+    text-align: left;
+}
+
+.win_card{
+    border: solid;
+    border-width: 2px;
+    border-bottom-color: #424242;
+    border-right-color: #424242;
+    border-left-color: #fff;
+    border-top-color: #fff;
+    background: silver;
+    color:#212529;
+}

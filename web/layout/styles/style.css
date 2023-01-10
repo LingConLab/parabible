@@ -1,0 +1,98 @@
+div {
+    box-sizing: border-box;
+    /*border: dashed 1px gray;*/
+}
+
+header {
+    border: 8px groove #1C6EA4;
+    border-radius: 11px;
+    padding: 15px;
+}
+
+body {
+    height:100%
+}
+
+.nav_box {
+    margin-top: 8px;
+}
+
+.nav_link {
+    background-color: #1C6EA4;
+    border-radius: 5px;
+    padding: 5px;
+    color: rgb(194, 220, 255);
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.column_parent {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    height: auto;
+    padding: 20px;
+}
+
+.row {
+    display: table;
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    
+    padding: 10px;
+}
+
+
+
+.item {
+    display: table-cell;
+    width: 25%  ;
+    padding: 5px;
+}
+
+.mv_button {
+    border: 2px solid;
+    border-radius: 4px;
+    max-width: 50%;
+    min-width: 30%;
+    float: right;
+    
+    position: static;
+    left: 10px;
+    transform: translateX(65%);
+}
+
+
+.inner_row {
+    display: table;
+    border: 5px groove #1C6EA4;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.column_header {
+    font-weight: bold;
+    font-size: larger;
+    text-align-last: center;
+}
+
+.column_item {
+    font-style: italic;
+}
+
+.lang1 {
+    background-color: rgb(206, 151, 206);
+}
+
+.lang2 {
+    background-color: rgb(170, 146, 231);
+}
+
+.lang3 {
+    background-color: rgb(151, 209, 197);
+}
+
+.lang4 {
+    background-color: rgb(209, 200, 151);
+}

@@ -1,0 +1,16 @@
+services:
+  db:
+    image: database
+    restart: always
+    build: 
+      context: ./postgres
+    ports: 
+      - 5432:5432
+    networks:
+      - backend
+    env_file:
+      - ./postgres/env_file
+    command: -p 1123
+
+networks:
+  backend: {}

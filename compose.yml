@@ -1,6 +1,7 @@
 services:
   db:
     image: database
+    container_name: parabible_db
     restart: always
     build: 
       context: ./postgres

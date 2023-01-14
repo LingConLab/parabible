@@ -13,6 +13,4 @@ def main():
         if file_count % 25 == 0: pb.set_postfix({'Files': file_count})
     
 if __name__ == '__main__':
-    b_t = time()
     main()
-    print(f"It took {round(time() - b_t, 2)}s")

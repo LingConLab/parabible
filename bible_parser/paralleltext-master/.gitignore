@@ -1,0 +1,10 @@
+*.Rout
+.DS_Store
+.Rapp.history
+.Rhistory
+.Rdata
+nohup.out
+*.log
+*.bak
+*.swp
+*~

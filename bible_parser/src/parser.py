@@ -36,7 +36,7 @@ def __get_file_lines(file_name: str) -> str:
                 continue
             yield line
 
-def parse_file(file_name: str, empty_value = None) -> dict[str, dict]:
+def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
     """ TODO """
     
     meta = {}
@@ -85,7 +85,7 @@ def parse_file(file_name: str, empty_value = None) -> dict[str, dict]:
         })
         
     return {
-        'file_name': file_name,
+        'file_name': file_name.name,
         'meta': meta,
         'data': data
     }

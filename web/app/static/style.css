@@ -1,6 +1,7 @@
 div {
     box-sizing: border-box;
-    /*border: dashed 1px gray;*/
+    border: dashed 1px gray;
+    display: inline-block;
 }
 
 header {
@@ -11,6 +12,14 @@ header {
 
 body {
     height:100%
+}
+
+.three-buttons {
+    box-sizing: border-box;
+    float: right;
+    margin-right: auto;
+    width: 25%;
+    background-color: #bf3f03;
 }
 
 .nav_box {

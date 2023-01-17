@@ -2,10 +2,12 @@
 
 <head>
     <title>Parabible</title>
+    <link rel="stylesheet" href="../static/style.css" />
 </head>
 
 <body>
     {% block navbar %}
+    <header>
     <nav class="nav_box">
         <h1>Parabible</h1>
         <div align="right">
@@ -14,6 +16,7 @@
             <button class="mv_button">Log in</button>
         </div>
     </nav>
+    </header>
     {% endblock %}
 
     {% block text_field %}

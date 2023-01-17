@@ -7,28 +7,20 @@
 
 <body>
     {% block navbar %}
-    <header>
-        <a class="navbar-brand" href="/">
-            <h2><b>ParaBible:</b> parallel biblical corpora</h2>
-        </a>
-        <div class="nav-item mr-1">
-            <button type="button" class="btn btn-outline-primary">About us</button>
-            <button type="button" class="btn btn-primary">Search</button>
-            <button type="button" class="btn btn-outline-primary">Sign in / Sign up</button>
-        </div>
-    </header>
-
-    {% endblock %} {% block content %}
-    <div class="container">
+    <nav class="nav_box">
+        <h1>Parabible</h1>
+        <button class="mv_button">About us</button>
+        <button class="mv_button">Search</button>
+        <button class="mv_button">Log in</button>
+    </nav>
+    {% endblock %}
+    <div class="container float-right">
         <ul class="list-group">
             <li class="list-group-item active">About ParaBible</li>
             <li class="list-group-item">Our Mission</li>
             <li class="list-group-item">How to use</li>
         </ul>
-
-        {# содержимое приложения которое должно быть предоставлено в блоке app_content #} {% block app_content %}{% endblock %}
-    </div>
-    {% endblock %}
+    </div>  
 </body>
 
 </html>

@@ -1,4 +1,3 @@
-{% extends 'bootstrap/base.html' %}
 <html>
 
 <head>
@@ -9,18 +8,23 @@
     {% block navbar %}
     <nav class="nav_box">
         <h1>Parabible</h1>
-        <button class="mv_button">About us</button>
-        <button class="mv_button">Search</button>
-        <button class="mv_button">Log in</button>
+        <div align="right">
+            <button class="mv_button">About us</button>
+            <button class="mv_button">Search</button>
+            <button class="mv_button">Log in</button>
+        </div>
     </nav>
     {% endblock %}
-    <div class="container float-right">
-        <ul class="list-group">
-            <li class="list-group-item active">About ParaBible</li>
-            <li class="list-group-item">Our Mission</li>
-            <li class="list-group-item">How to use</li>
+
+    {% block text_field %}
+    <div>
+        <ul>
+            <li>About ParaBible</li>
+            <li>Our Mission</li>
+            <li>How to use</li>
         </ul>
-    </div>  
+    </div>
+    {% endblock %}
 </body>
 
 </html>

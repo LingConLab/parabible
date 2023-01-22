@@ -11,7 +11,7 @@ services:
       - backend
     env_file:
       - ./postgres/env_file
-    command: -p 1123
+    command: -p 5432
 
 networks:
   backend: {}

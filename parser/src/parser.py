@@ -6,7 +6,14 @@ from pprint import pprint
 from .line_blacklist import blacklist
 
 def __get_files(rel_path) -> list[Path]:
-    """ Get all file names from inputed relative dir path. (Relative to 'main.py')"""
+    """Get all file names from inputed relative dir path. (Relative to 'main.py')
+
+    Args:
+        `rel_path` (str|Path): relative directory path
+
+    Returns:
+        list[Path]: list of all file paths in the directory
+    """
 
     current_dir = Path(__file__).parent.parent.resolve()
     abs_dir = current_dir.joinpath(rel_path)
@@ -14,7 +21,17 @@ def __get_files(rel_path) -> list[Path]:
     return [abs_dir.joinpath(f) for f in file_names]
 
 def __get_file_meta(file_name: str) -> str:
-    """ Generator that cleans, fixes and yields meta line by line """
+    """ Generator that cleans, fixes and yields meta line by line
+
+    Args:
+        `file_name` (str): file name
+
+    Returns:
+        Iterator[str]
+
+    Yields:
+        str: a meta data line
+    """
 
     with open(file_name, 'r', encoding='utf-8') as f:
         for line in f:
@@ -28,7 +45,17 @@ def __get_file_meta(file_name: str) -> str:
             yield final_line
 
 def __get_file_lines(file_name: str) -> str:
-    """ TODO """
+    """ Generator that yields content lines one by one
+
+    Args:
+        `file_name` (str): file name
+
+    Returns:
+        Iterator[str]
+
+    Yields:
+        str: a content line
+    """
 
     with open(file_name, 'r', encoding='utf-8') as f:
         for line in f:
@@ -37,7 +64,48 @@ def __get_file_lines(file_name: str) -> str:
             yield line
 
 def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
-    """ TODO """
+    """ Get a dict of parsed data
+
+    Args:
+        `file_name` (Path): file name
+        `empty_value` (Any, optional): The value to what empty values will be set. Defaults to None.
+
+    Raises:
+        AttributeError: If content line doesn't pass regex
+
+    Returns:
+        dict[str, dict]:    {
+            'file_name': str,
+            'meta': dict,
+            'data': dict,
+        }
+        
+    Return short example:
+        {
+            "file_name": "eng-x-bible-riverside.txt",
+            "meta": {
+                "language_name": "English",
+                "year_long": "1923; 2009",
+                "meta_tag": "meta_val",
+            },
+            "data": {
+                "lines": [  
+                    {
+                        "book_id": "40",
+                        "chapter_id": "001",
+                        "verse_id": "001",
+                        "line": "THE ancestral line of Jesus Christ , son of David , son of Abraham :"
+                    },
+                    {
+                        "book_id": "40",
+                        "chapter_id": "001",
+                        "verse_id": "002",
+                        "line": "Abraham was the father of Isaac ; Isaac was the father of Jacob ; Jacob was the father of Judah and his brothers ;"
+                    }
+                ]
+            }
+        }               
+    """
     
     meta = {}
     data = {
@@ -91,6 +159,14 @@ def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
     }
 
 def parsed_translations(rel_path):
+    """ Yields parsed data of the files in `rel_path` relative path
+
+    Args:
+        `rel_path` (str | Path): relative path to the file
+
+    Yields:
+        dict: see `parse_file()`
+    """
     files = __get_files(rel_path)
     for f in files:
         yield parse_file(f)

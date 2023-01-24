@@ -1,3 +1,4 @@
 *.pyc
 paralleltext-master.exe
 tsa/
+.vscode/

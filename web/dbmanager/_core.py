@@ -11,6 +11,8 @@ class BibleDB():
     DB_PORT = "5432"
 
     def __init__(self) -> None:
+        """Initializates connection and creates tables if dont exist
+        """
         self.conn = psycopg2.connect(
             database    =   self.DB_NAME,
             user        =   self.DB_USER,
@@ -20,7 +22,7 @@ class BibleDB():
         )
         self.create_tables()
 
-    def create_tables(self) -> None:
+    def create_tables(self) -> None:  
         cur = self.conn.cursor()
         
         for table in table_schemas:
@@ -36,16 +38,54 @@ class BibleDB():
 
         self.conn.commit()
 
-    def get_text_list(self):
+    def get_text_list(self, collumns: list[str] = None):
+        """Return ids and other collumns of all the texts
+
+        Args:
+            collumns (list[str], optional): If None, returns defualt set of db collumns.
+            You can override it
+
+            Default: [
+                "closest_iso_639_3",
+                "vernacular_title",
+                "year_short"
+            ]
+
+        Returns:
+            list[dict]: list of entries dicts. Col name: value
+        """
+
+        if not collumns:
+            collumns = [
+                "closest_iso_639_3",
+                "vernacular_title",
+                "year_short"
+            ]
+        collumns.insert(0, "id")
+
         cur = self.conn.cursor()
 
-        cur.execute("""
-            SELECT * from translations
+        cur.execute(f"""
+            SELECT
+                {''.join([f"{c}," for c in collumns]).removesuffix(',')}
+            FROM translations
         """)
 
-        return cur.fetchall()
+        result = cur.fetchall()
+        return [{collumns[i]: tup[i] for i in range(len(tup))} for tup in result]
 
-    def get_verse(self, book_id: int, chapter_id, verse_id, translation_id):
+    def get_verse(self, book_id: int, chapter_id: int, verse_id: int, translation_id: int) -> str:
+        """Get verse text in specific translation
+
+        Args:
+            book_id (int): id of the book
+            chapter_id (int): id of the chapter
+            verse_id (int): id of the verse
+            translation_id (int): id of the translation
+
+        Returns:
+            str: text of the verse
+        """
         cur = self.conn.cursor()
 
         cur.execute("""
@@ -60,6 +100,15 @@ class BibleDB():
         return cur.fetchall()
 
     def get_lang_id(self, lang_name: str) -> int:
+        """Dummy. Dont use it. It does nothing
+
+        Args:
+            lang_name (str): _description_
+
+        Returns:
+            int: _description_
+        """
+        return -1
         existing = self.get_lang_id_only_if_exists(lang_name=lang_name)
         if existing >= 0: return existing
 
@@ -75,6 +124,16 @@ class BibleDB():
         return cur.fetchone()
 
     def get_lang_id_only_if_exists(self, lang_name: str) -> int:
+        """Dummy. Dont use it. It does nothing
+
+        Args:
+            lang_name (str): _description_
+
+        Returns:
+            int: _description_
+        """
+        return -1
+        
         lang_name = lang_name.strip().lower()
         cur = self.conn.cursor()
         cur.execute("""

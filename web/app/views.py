@@ -2,7 +2,7 @@ from app import app
 from flask import render_template, request
 import os
 
-PATH_TO_CORPORA = "parser/bible_json"
+PATH_TO_CORPORA = "dbmanager/bible_json"
 corpora_texts = [x for x in os.listdir(PATH_TO_CORPORA)]
 
 

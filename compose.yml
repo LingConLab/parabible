@@ -15,6 +15,8 @@ services:
     image: flask-front
     container_name: parabible-flask
     restart: always
+    depends_on:
+      - db
     build:
       context: ./web
     ports:

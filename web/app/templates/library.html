@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>{% extends 'bootstrap/base.html' %}</head>
+
+<body>
+  {% block navbar %}
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
+      <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
+        <ul class="nav navbar-nav btn-group">
+          <a href="/home"><button class="button">About us</button></a>
+          <a href="/library"><button class="button">Search</button></a>
+          <button class="button">Log in</button>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  {% endblock %}
+  {% block content %}
+  <div class="row d-flex justify-content-center">
+    <div class="col-sm-3 mx-left"></div>
+    <div class="col-sm-5 mx-center">
+      <ul class="list-group">
+        {% for book in book_list %}
+        <li class="list-group-item">
+          <a href="#item1" data-toggle="collapse">‣ {{ book }}</a>
+          <ul id="item1" class="collapse list-group">
+            {% for text in book_list[book] %}
+            <form method="post">
+              <div class="form-check">
+                <li class="list-group-item">{{ text }} <input type="checkbox" class="form-check-input"
+                    name="text_choose"></li>
+              </div>
+            </form>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+      <input type="submit">
+    </div>
+    <div class="col-sm-4 mx-right"></div>
+  </div>
+  {% endblock %}
+</body>
+
+</html>

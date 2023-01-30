@@ -16,8 +16,8 @@ files = [
     "eng-x-bible-riverside.json"
 ]
 
-for file in files:
-   bible_db.insert_new_text(load_data(file))
+#for file in files:
+#    bible_db.insert_new_text(load_data(file))
 
 pprint(bible_db.get_text_list())
 

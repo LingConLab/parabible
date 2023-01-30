@@ -1,16 +1,18 @@
 # Overview
 Consists of a flask python app and a postresql database. They exist in two different docker containers. Flask app refers to the DB via local network.
 
->`docker-compose up`
+For a quick start run these:
+>`python3 db_init.py`<br>
+`docker-compose up`
 
-*starts python flask and postgresql containers*
-
-# Docker handling shell scripts
+# Docker handling shell/python scripts
 
 These scripts help handle operations with docker.
 
 ~~Before running `docker-compose up` make sure to run `init` script first. This will launch docker container and parse and insert all the data into database.~~ (This isnt working for now)
 
+* `db_init.py`
+    * Parses data from *parser/paralleltext-matser/bibles/corpus/* to the database. You dont need to run itevery time you launch docker. Only on first launch or if you have updated curpus (the mentioned derectories). **Database docker container must be accessable and running!**
 * `stop` sh script
     * stops all parabible's running containers
 * `vipe` sh scrips

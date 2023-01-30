@@ -1,6 +1,10 @@
 import psycopg2
 import logging
 
+logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 from ._schemas import table_schemas
 
 class BibleDB():
@@ -148,15 +152,50 @@ class BibleDB():
         
         return -1
 
-    def insert_new_text(self, data):
+    def insert_new_text(self, data: dict) -> None:
+        """Loads new text into db
+
+        Args:
+            data (dict): text data
+
+        Text data format example:
+            {
+                "meta": {
+                    "language_name": "English",
+                    "year_long": "1923; 2009",
+                    "meta_tag": "meta_val",
+                },
+                "data": {
+                    "lines": [  
+                        {
+                            "book_id": 40,
+                            "chapter_id": 1,
+                            "verse_id": 1,
+                            "line": "THE ancestral line of Jesus Christ , son of David , son of Abraham :"
+                        },
+                        {
+                            "book_id": 40,
+                            "chapter_id": 1,
+                            "verse_id": 2,
+                            "line": "Abraham was the father of Isaac ; Isaac was the father of Jacob ; Jacob was the father of Judah and his brothers ;"
+                        }
+                    ]
+                }
+            }
+        """
+
+        if self.__is_dublicate_by_url(data["meta"]["url"]):
+            logger.info(f'Text from {data["meta"]["url"]} is already present. It is skipped')
+            return
+            
         translation_id = self.__insert_translation_meta(data["meta"])
-        logging.info(f"inserting verses of text with id = {translation_id} ({data['meta']['vernacular_title']})")
+        logger.debug(f"inserting verses of text with id = {translation_id} ({data['meta']['vernacular_title']})")
 
         verse_cursor = self.conn.cursor()
         for verse in data["data"]["lines"]:
             self.__insert_verse(verse, translation_id, verse_cursor)
         self.conn.commit()
-        logging.info(f"{len(data['data']['lines'])} verses done!")
+        logger.info(f"{len(data['data']['lines'])} verses done!")
 
     def __insert_verse(self, data: dict, translation_id: int, cur):
         cur.execute("""
@@ -198,3 +237,13 @@ class BibleDB():
             return returned_id
         else:
             raise Exception(f"returned_id expected to be int. Got {returned_id} ({type(returned_id)})")
+
+    def __is_dublicate_by_url(self, url: str) -> bool:
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT id
+            FROM translations
+            WHERE url = %s
+        """, (url,))
+        result = cursor.fetchall()
+        return bool(len(result))

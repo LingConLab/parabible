@@ -7,21 +7,21 @@ import logging
 from .line_blacklist import blacklist
 
 logging.basicConfig(format="%(levelname)s %(message)s", level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
-def __get_files(rel_path) -> list[Path]:
-    """Get all file names from inputed relative dir path. (Relative to 'main.py')
+def __get_files(str_path) -> list[Path]:
+    """Get all file names from inputed path
 
     Args:
-        `rel_path` (str|Path): relative directory path
+        `rel_path` (str|Path): directory path
 
     Returns:
         list[Path]: list of all file paths in the directory
     """
 
-    current_dir = Path(__file__).parent.parent.resolve()
-    abs_dir = current_dir.joinpath(rel_path)
-    file_names = os_listdir(abs_dir)
-    return [abs_dir.joinpath(f) for f in file_names]
+    path = Path(str_path)
+    file_names = os_listdir(path)
+    return [path.joinpath(f) for f in file_names]
 
 def __get_file_meta(file_name: str) -> str:
     """ Generator that cleans, fixes and yields meta line by line
@@ -116,7 +116,7 @@ def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
     
     def check_blacklist(l):
         if l.strip() in blacklist:
-            logging.debug(f"\nMet balcklisted line in {file_name} line: {line_no}\n{l}\n")
+            logger.debug(f"\nMet balcklisted line in {file_name} line: {line_no}\n{l}\n")
             return False
         return True
     
@@ -126,7 +126,7 @@ def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
         try:
             key, val = l.replace('# ', '').split(':', maxsplit=1)
         except ValueError:
-            logging.debug(f"Meta line cant be splitted. File: {file_name} Line:{l}")
+            logger.debug(f"Meta line cant be splitted. File: {file_name} Line:{l}")
             key = l.replace('# ', '').replace(':', '')
             val = ''
         # Problem №2 solving
@@ -154,7 +154,7 @@ def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
                 "line": line
             })
         except ValueError:
-            logging.debug(f"""Id is not int. Values are\n
+            logger.debug(f"""Id is not int. Values are\n
                 b_id:{b_id} ({type(b_id)})
                 ch_id:{ch_id} ({type(ch_id)})
                 vrs_id:{vrs_id} ({type(vrs_id)})
@@ -165,7 +165,7 @@ def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
         'data': data
     }
 
-def parsed_translations(rel_path):
+def parsed_texts(rel_path):
     """ Yields parsed data of the files in `rel_path` relative path
 
     Args:

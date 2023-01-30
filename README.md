@@ -2,10 +2,10 @@
 Consists of a flask python app and a postresql database. They exist in two different docker containers. Flask app refers to the DB via local network.
 
 For a quick start run these:
-<code><br>
-python3 db_init.py<br>
+<pre>
 docker-compose up
-</code>
+python3 db_init.py
+</pre>
 
 # Docker handling shell/python scripts
 

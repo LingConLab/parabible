@@ -1,11 +1,30 @@
 import psycopg2
 import logging
 
-logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
+logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 from ._schemas import table_schemas
+
+def check_conn(func):
+    def wrapped(self, *args, **kwargs):
+        if self.conn:
+            logger.debug(f"Connection is present. {self.conn}")
+            return func(self, *args, **kwargs)
+        else:
+            logger.fatal(f"Attempted to access database with no connection to the database.{args}")
+            logger.info(f"Trying to reconnect")
+            try:
+                self.conn = self.connect(self.DB_HOST)
+            except psycopg2.OperationalError:
+                try:
+                    self.conn = self.connect(self.ALT_DB_HOST)
+                except psycopg2.OperationalError as e:
+                    logger.critical(f"Failed to cennect to the datbase{e}")
+                    self.conn = None
+            
+    return wrapped
 
 class BibleDB():
     DB_NAME = "parabible"
@@ -18,24 +37,25 @@ class BibleDB():
         """Initializates connection and creates tables if dont exist
         """
         try:
-            self.conn = psycopg2.connect(
-                database    =   self.DB_NAME,
-                user        =   self.DB_USER,
-                password    =   self.DB_PASS,
-                host        =   self.DB_HOST,
-                port        =   self.DB_PORT
-            )
+            self.conn = self.connect(self.DB_HOST)
         except psycopg2.OperationalError:
-            logger.debug(f"{self.DB_HOST} is unreachable. Trying {self.ALT_DB_HOST}")
-            self.conn = psycopg2.connect(
-                database    =   self.DB_NAME,
-                user        =   self.DB_USER,
-                password    =   self.DB_PASS,
-                host        =   self.ALT_DB_HOST,
-                port        =   self.DB_PORT
-            )
+            try:
+                self.conn = self.connect(self.ALT_DB_HOST)
+            except psycopg2.OperationalError as e:
+                logger.critical(f"Failed to cennect to the datbase{e}")
+                self.conn = None
         self.create_tables()
 
+    def connect(self, host):
+        return psycopg2.connect(
+            database    =   self.DB_NAME,
+            user        =   self.DB_USER,
+            password    =   self.DB_PASS,
+            host        =   host,
+            port        =   self.DB_PORT
+        )
+
+    @check_conn
     def create_tables(self) -> None:  
         cur = self.conn.cursor()
         
@@ -43,15 +63,18 @@ class BibleDB():
             collumns = ''.join([f"{k} {v}," for k, v in table["collumns"].items()])
             other = ''.join([f"{val}," for val in table["other"]])
 
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS "{name}"({collumns})
-            """.format(
-                name = table["name"],
-                collumns = str(collumns + other).removesuffix(',')
-            ))
+                """.format(
+                    name = table["name"],
+                    collumns = str(collumns + other).removesuffix(',')
+                )
+            )
 
         self.conn.commit()
-
+    
+    @check_conn
     def get_text_list(self, collumns: list[str] = None) -> list[dict]:
         """Return ids and other collumns of all the texts
 
@@ -86,8 +109,10 @@ class BibleDB():
         """)
 
         result = cur.fetchall()
-        return [{collumns[i]: tup[i] for i in range(len(tup))} for tup in result]
+        dict_formatted = [{collumns[i]: tup[i] for i in range(len(tup))} for tup in result]
+        return dict_formatted
 
+    @check_conn
     def get_verse(self, book_id: int, chapter_id: int, verse_id: int, translation_id: int) -> str:
         """Get verse text in specific translation
 
@@ -111,8 +136,9 @@ class BibleDB():
                 translation_id = %s
         """, (book_id, chapter_id, verse_id, translation_id))
 
-        return cur.fetchall()
+        return cur.fetchone()[0]
 
+    @check_conn
     def get_lang_id(self, lang_name: str) -> int:
         """Dummy. Dont use it. It does nothing
 
@@ -137,6 +163,7 @@ class BibleDB():
         self.conn.commit()
         return cur.fetchone()
 
+    @check_conn
     def get_lang_id_only_if_exists(self, lang_name: str) -> int:
         """Dummy. Dont use it. It does nothing
 
@@ -162,6 +189,7 @@ class BibleDB():
         
         return -1
 
+    @check_conn
     def insert_new_text(self, data: dict) -> None:
         """Loads new text into db
 
@@ -222,6 +250,7 @@ class BibleDB():
         self.conn.commit()
         #logger.info(f"{len(data['data']['lines'])} verses done!")
 
+    @check_conn
     def __form_verse_values_string(self, data: dict, translation_id: int, cur) -> str:
         return cur.mogrify(
             "(%s, %s, %s, %s, %s)",
@@ -232,6 +261,7 @@ class BibleDB():
             )
         )
 
+    @check_conn
     def __insert_verse(self, data: dict, translation_id: int, cur):
         values_string = self.__form_verse_values_string(data, translation_id, cur)
         cur.execute(b"""
@@ -241,6 +271,7 @@ class BibleDB():
                 """ + values_string
         )
 
+    @check_conn
     def __insert_verse_bulk(self, data_list: list[dict], begin: int, end: int, translation_id: int, cur):
         """`begin`, `end` are indexes of current window.
         In order to not use additional memory.
@@ -261,6 +292,7 @@ class BibleDB():
                 """ + values_string + b" ON CONFLICT DO NOTHING"
         )
 
+    @check_conn
     def __insert_translation_meta(self, meta):
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -288,6 +320,7 @@ class BibleDB():
         else:
             raise Exception(f"returned_id expected to be int. Got {returned_id} ({type(returned_id)})")
 
+    @check_conn
     def __is_dublicate(self, meta: dict) -> bool:
         cursor = self.conn.cursor()
         cursor.execute("""

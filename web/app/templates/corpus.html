@@ -22,25 +22,15 @@
   <div class="row d-flex justify-content-center">
     <div class="col-sm-3 mx-left"></div>
     <div class="col-sm-5 mx-center">
-      <form method="post" action="/corpus">
         <ul class="list-group">
-          {% for book in book_list %}
-          <li class="list-group-item">
-            <a href="#item1" data-toggle="collapse">{{ book }}</a>
-            <ul id="item1" class="collapse list-group">
-              {% for text in book_list[book] %}
-              <div class="form-check">
-                <li class="list-group-item">{{ text["vernacular_title"] }}
-                  <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
+            {% for verse in verses %}
+            <div class="form-check">
+                <li class="list-group-item">
+                    <p class="text-center">{{ verse }}</p>
                 </li>
-              </div>
-              {% endfor %}
-            </ul>
-          </li>
-          {% endfor %}
+            </div>
+            {% endfor %}
         </ul>
-        <input type="submit">
-      </form>
     </div>
     <div class="col-sm-4 mx-right"></div>
   </div>

@@ -28,6 +28,12 @@ services:
     networks:
       - db_backend
 
+    # !!!
+    # COMMENT THIS TO ENABLE FRONTEND
+    #profiles:
+    #  - donotstart
+    # !!!
+
 networks:
   db_backend:
     name: db_backend

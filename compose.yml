@@ -2,7 +2,7 @@ services:
   db:
     image: database
     container_name: parabible-db
-    restart: always
+    hostname: parabible-postgresql
     build: 
       context: ./postgres
     ports: 
@@ -10,19 +10,24 @@ services:
     env_file:
       - ./postgres/env_file
     command: -p 5432
+    networks:
+      - db_backend
     
   flask-front:
     image: flask-front
     container_name: parabible-flask
-    restart: always
     depends_on:
       - db
+    restart: on-failure:5 
     build:
       context: ./web
     ports:
       - 5000:5000
     env_file:
       - ./web/env_file
+    networks:
+      - db_backend
 
 networks:
-  backend: {}
+  db_backend:
+    name: db_backend

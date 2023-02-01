@@ -11,19 +11,29 @@ class BibleDB():
     DB_NAME = "parabible"
     DB_USER = "dev"
     DB_PASS = "dev"
-    DB_HOST = "0.0.0.0"
+    DB_HOST = "parabible-postgresql"; ALT_DB_HOST = "0.0.0.0"
     DB_PORT = "5432"
 
     def __init__(self) -> None:
         """Initializates connection and creates tables if dont exist
         """
-        self.conn = psycopg2.connect(
-            database    =   self.DB_NAME,
-            user        =   self.DB_USER,
-            password    =   self.DB_PASS,
-            host        =   self.DB_HOST,
-            port        =   self.DB_PORT
-        )
+        try:
+            self.conn = psycopg2.connect(
+                database    =   self.DB_NAME,
+                user        =   self.DB_USER,
+                password    =   self.DB_PASS,
+                host        =   self.DB_HOST,
+                port        =   self.DB_PORT
+            )
+        except psycopg2.OperationalError:
+            logger.debug(f"{self.DB_HOST} is unreachable. Trying {self.ALT_DB_HOST}")
+            self.conn = psycopg2.connect(
+                database    =   self.DB_NAME,
+                user        =   self.DB_USER,
+                password    =   self.DB_PASS,
+                host        =   self.ALT_DB_HOST,
+                port        =   self.DB_PORT
+            )
         self.create_tables()
 
     def create_tables(self) -> None:  
@@ -42,7 +52,7 @@ class BibleDB():
 
         self.conn.commit()
 
-    def get_text_list(self, collumns: list[str] = None):
+    def get_text_list(self, collumns: list[str] = None) -> list[dict]:
         """Return ids and other collumns of all the texts
 
         Args:

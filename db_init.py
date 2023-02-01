@@ -19,7 +19,7 @@ def main():
         if iter % auto_commit_threshold == 0:
             logger.debug(f"Commiting DB changes")
             bible_db.conn.commit()
-        #logger.info(f"Processing {file_name}")
+        logger.debug(f"Processing {file_name}")
 
         bible_db.insert_new_text(text_data)
 

@@ -184,31 +184,71 @@ class BibleDB():
             }
         """
 
-        if self.__is_dublicate_by_url(data["meta"]["url"]):
-            logger.info(f'Text from {data["meta"]["url"]} is already present. It is skipped')
+        if self.__is_dublicate(data["meta"]):
+            logger.debug(f'\033[FText from {data["meta"]["url"]} is already present. It is skipped')
             return
-            
+
+        verse_cursor = self.conn.cursor()            
         translation_id = self.__insert_translation_meta(data["meta"])
+        
         logger.debug(f"inserting verses of text with id = {translation_id} ({data['meta']['vernacular_title']})")
 
-        verse_cursor = self.conn.cursor()
-        for verse in data["data"]["lines"]:
-            self.__insert_verse(verse, translation_id, verse_cursor)
-        self.conn.commit()
-        logger.info(f"{len(data['data']['lines'])} verses done!")
+        """ for verse in data["data"]["lines"]:
+            self.__insert_verse(verse, translation_id, verse_cursor) """
+        bulk_size = 100
+        verse_amount = len(data["data"]["lines"])
 
-    def __insert_verse(self, data: dict, translation_id: int, cur):
-        cur.execute("""
-                INSERT INTO verses
-                (book_id, chapter_id, verse_id, translation_id, line)
-                VALUES
-                (%s, %s, %s, %s, %s)
-            """,
+        logger.debug(f"{verse_amount} verses, {bulk_size} bulk size")
+
+        for i in range(0, verse_amount - bulk_size, bulk_size):
+            self.__insert_verse_bulk(
+                data["data"]["lines"],
+                i,
+                min(i + bulk_size, verse_amount),
+                translation_id,
+                verse_cursor
+            )
+
+        self.conn.commit()
+        #logger.info(f"{len(data['data']['lines'])} verses done!")
+
+    def __form_verse_values_string(self, data: dict, translation_id: int, cur) -> str:
+        return cur.mogrify(
+            "(%s, %s, %s, %s, %s)",
             (
                 data["book_id"], data["chapter_id"],
                 data["verse_id"], translation_id,
                 data["line"]
             )
+        )
+
+    def __insert_verse(self, data: dict, translation_id: int, cur):
+        values_string = self.__form_verse_values_string(data, translation_id, cur)
+        cur.execute(b"""
+                INSERT INTO verses
+                (book_id, chapter_id, verse_id, translation_id, line)
+                VALUES
+                """ + values_string
+        )
+
+    def __insert_verse_bulk(self, data_list: list[dict], begin: int, end: int, translation_id: int, cur):
+        """`begin`, `end` are indexes of current window.
+        In order to not use additional memory.
+        We dont slice or copy subarray, we pass it and tell the borders"""
+
+        logger.debug(f"[{begin}, {end})")
+
+        values_string = b','.join(
+            self.__form_verse_values_string(
+                data_list[i], translation_id, cur
+            )
+            for i in range(begin, end)
+        )
+        cur.execute(b"""
+                INSERT INTO verses
+                (book_id, chapter_id, verse_id, translation_id, line)
+                VALUES
+                """ + values_string + b" ON CONFLICT DO NOTHING"
         )
 
     def __insert_translation_meta(self, meta):
@@ -238,12 +278,15 @@ class BibleDB():
         else:
             raise Exception(f"returned_id expected to be int. Got {returned_id} ({type(returned_id)})")
 
-    def __is_dublicate_by_url(self, url: str) -> bool:
+    def __is_dublicate(self, meta: dict) -> bool:
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT id
             FROM translations
-            WHERE url = %s
-        """, (url,))
+            WHERE
+                url                 = %s AND
+                vernacular_title    = %s AND
+                english_title       = %s
+        """, (meta['url'], meta['vernacular_title'], meta['english_title']))
         result = cursor.fetchall()
         return bool(len(result))

@@ -1,9 +1,11 @@
 from app import app
-from dbmanager import bible_db
+from dbmanager import BibleDB
 from flask import render_template, request
 import logging
 from pprint import pformat
 import os
+
+bible_db = BibleDB()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

@@ -17,33 +17,29 @@ def check_conn(func):
             logger.info(f"Trying to reconnect")
             try:
                 self.conn = self.connect(self.DB_HOST)
-            except psycopg2.OperationalError:
-                try:
-                    self.conn = self.connect(self.ALT_DB_HOST)
-                except psycopg2.OperationalError as e:
-                    logger.critical(f"Failed to cennect to the datbase{e}")
-                    self.conn = None
+            except psycopg2.OperationalError as e:
+                logger.critical(f"Failed to reconnect to the database {e}")
+                self.conn = None
             
     return wrapped
 
 class BibleDB():
-    DB_NAME = "parabible"
-    DB_USER = "dev"
-    DB_PASS = "dev"
-    DB_HOST = "parabible-postgresql"; ALT_DB_HOST = "0.0.0.0"
-    DB_PORT = "5432"
-
-    def __init__(self) -> None:
+    def __init__(self, override_host = None) -> None:
         """Initializates connection and creates tables if dont exist
         """
+
+
+        self.DB_NAME = "parabible"
+        self.DB_USER = "dev"
+        self.DB_PASS = "dev"
+        self.DB_HOST = override_host if override_host else "db"
+        self.DB_PORT = "5432"
+
         try:
             self.conn = self.connect(self.DB_HOST)
-        except psycopg2.OperationalError:
-            try:
-                self.conn = self.connect(self.ALT_DB_HOST)
-            except psycopg2.OperationalError as e:
-                logger.critical(f"Failed to cennect to the datbase{e}")
-                self.conn = None
+        except psycopg2.OperationalError as e:
+            logger.critical(f"Failed to connect to the datbase{e}")
+            self.conn = None
         self.create_tables()
 
     def connect(self, host):

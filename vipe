@@ -1,11 +1,10 @@
 #!/bin/sh -x
 
-set -e
-
 ./stop
 
 docker rm parabible-flask
 docker rm parabible-db
+docker rm parabible-pgAdmin
 
 docker rmi flask-front
 docker rmi database

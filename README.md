@@ -38,3 +38,62 @@ Flask web app, its docker files,
 `dbmanager` module that provides access to the DB
 
 ***For the details see readme files in other dirs***
+
+
+```
+parabible
+├─ .gitignore
+├─ README.md
+├─ compose.yml
+├─ db_init.py
+├─ init
+├─ paralleltext-master
+│  ├─ .gitignore
+│  ├─ README.md
+│  ├─ bibleParse.py
+│  └─ bibles
+│     ├─ bul-x-bible-newworld.txt
+│     ├─ deu-x-bible-neue.txt
+│     ├─ eng-x-bible-worldwide.txt
+│     ├─ jpn-x-bible-newworld.txt
+│     └─ pol-x-bible-newworld.txt
+├─ postgres
+│  ├─ Dockerfile
+│  ├─ README.md
+│  └─ env_file
+├─ stop
+├─ vipe
+└─ web
+   ├─ Dockerfile
+   ├─ README.md
+   ├─ app
+   │  ├─ __init__.py
+   │  ├─ __pycache__
+   │  ├─ static
+   │  │  ├─ EBGaramond-Regular.ttf
+   │  │  └─ style.css
+   │  ├─ templates
+   │  │  ├─ corpus.html
+   │  │  ├─ home.html
+   │  │  ├─ index.html
+   │  │  └─ library.html
+   │  └─ views.py
+   ├─ dbmanager
+   │  ├─ __init__.py
+   │  ├─ __pycache__
+   │  ├─ _core.py
+   │  ├─ _schemas.py
+   │  ├─ data
+   │  │  └─ schemas.json
+   │  └─ parser
+   │     ├─ README.md
+   │     ├─ __init__.py
+   │     ├─ __pycache__
+   │     ├─ faced_problems.md
+   │     ├─ line_blacklist.py
+   │     └─ parser.py
+   ├─ env_file
+   ├─ requirements.txt
+   └─ run.py
+
+```

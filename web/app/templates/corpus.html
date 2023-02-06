@@ -19,22 +19,60 @@
   </nav>
   {% endblock %}
   {% block content %}
-  <div class="row d-flex justify-content-center">
-    <div class="col-sm-3 mx-left"></div>
-    <div class="col-sm-5 mx-center">
-        <ul class="list-group">
-            {% for verse in verses %}
-            <div class="form-check">
-                <li class="list-group-item">
-                    <p class="text-center">{{ verse }}</p>
-                </li>
-            </div>
-            {% endfor %}
-        </ul>
+  <div class="d-flex justify-content-around">
+    <div style="margin-inline: 200px;">
+      <form action="">
+        <label for="book">Book id:</label>
+        <select name="book" id="book" disabled>
+          {% for b_id in b_ids %}
+            <option value="{{ b_id }}">{{ b_id }}</option>
+          {% endfor %}
+        </select>
+        <label for="book">Chapter id:</label>
+        <select name="book" id="book" disabled>
+          {% for ch_id in ch_ids %}
+            <option value="{{ ch_id }}">{{ ch_id }}</option>
+          {% endfor %}
+        </select>
+        <label for="book">Verse id:</label>
+        <select name="book" id="book" disabled>
+          {% for v_id in v_ids %}
+            <option value="{{ v_id }}">{{ v_id }}</option>
+          {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Add verse" disabled>
+      </form>
     </div>
-    <div class="col-sm-4 mx-right"></div>
+    <div style="padding-inline: 50px;">
+      <table class="table mx-auto">
+        <thead>
+          <tr>
+            <th scope="col">id</th>
+            {% for meta_dict in texts_meta %}
+              <th scope="col">[{{ meta_dict["closest_iso_639_3"] }}] <br> {{ meta_dict["vernacular_title"] }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for verse_id in verse_ids %}
+            <tr>
+              <th>{{ verse_id }}</th>
+              {% for meta_dict in texts_meta %}
+                <td>
+                  {{ meta_dict["verses"][verse_id] }}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   {% endblock %}
+  <script>
+
+  </script>
 </body>
 
 </html>

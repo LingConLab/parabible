@@ -1,9 +1,12 @@
 import psycopg2
+from psycopg2.extras import RealDictCursor, DictCursor
+from psycopg2.extensions import AsIs
+from typing import Literal
 import logging
 
 logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 from ._schemas import table_schemas
 
@@ -24,22 +27,32 @@ def check_conn(func):
     return wrapped
 
 class BibleDB():
-    def __init__(self, override_host = None) -> None:
-        """Initializates connection and creates tables if dont exist
-        """
+    def __init__(self, host_options: list = None) -> None:
+        """Initializates connection and creates tables if dont exist"""
 
+        if not host_options:
+            host_options = []
+
+        host_options.append('0.0.0.0')
+        host_options.append('localhost')
+        host_options.append('db')
 
         self.DB_NAME = "parabible"
         self.DB_USER = "dev"
         self.DB_PASS = "dev"
-        self.DB_HOST = override_host if override_host else "db"
         self.DB_PORT = "5432"
 
-        try:
-            self.conn = self.connect(self.DB_HOST)
-        except psycopg2.OperationalError as e:
-            logger.critical(f"Failed to connect to the datbase{e}")
-            self.conn = None
+        for host in host_options:
+            try:
+                self.conn = self.connect(host)
+                logger.info(f"Connected to host {host}")
+                break
+            except psycopg2.OperationalError as e:
+                logger.error(f"Failed to connect to the host {host}\n{e}")
+        else:
+            # raise OperationalError exeption
+            self.connect(host_options[0])
+
         self.create_tables()
 
     def connect(self, host):
@@ -109,7 +122,7 @@ class BibleDB():
         return dict_formatted
 
     @check_conn
-    def get_verse(self, book_id: int, chapter_id: int, verse_id: int, translation_id: int) -> str:
+    def get_verse(self, verse_id: tuple[int], translation_id: int) -> str:
         """Get verse text in specific translation
 
         Args:
@@ -121,69 +134,55 @@ class BibleDB():
         Returns:
             str: text of the verse
         """
+    
+        logger.debug(f"SELECT verse with id {verse_id} translation {translation_id}")
         cur = self.conn.cursor()
 
-        cur.execute("""
-            SELECT line from verses
-            WHERE 
-                book_id = %s AND
-                chapter_id = %s AND
-                verse_id = %s AND
-                translation_id = %s
-        """, (book_id, chapter_id, verse_id, translation_id))
+        cur.execute(
+            """
+                SELECT line FROM verses
+                WHERE 
+                    book_id = %s AND
+                    chapter_id = %s AND
+                    verse_id = %s AND
+                    translation_id = %s
+            """, (verse_id[0], verse_id[1], verse_id[2], translation_id))
 
-        return cur.fetchone()[0]
+        result = cur.fetchone()
+        return result[0] if result else result
 
     @check_conn
-    def get_lang_id(self, lang_name: str) -> int:
-        """Dummy. Dont use it. It does nothing
+    def get_text_meta(self, id: int) -> dict[str, any]:
+        """Get meta of the text by its id
 
         Args:
-            lang_name (str): _description_
+            id (int): Id of the text
 
         Returns:
-            int: _description_
+            dict[str, any]: Meta of the text
         """
-        return -1
-        existing = self.get_lang_id_only_if_exists(lang_name=lang_name)
-        if existing >= 0: return existing
+        cur = self.conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(
+            """ SELECT * FROM translations WHERE id = %s; """,
+            (id,)
+        )
 
-        cur = self.conn.cursor()
-        cur.execute("""
-            INSERT INTO langs
-            (name)
-            VALUES
-            (%s)
-            RETURNING id
-        """, (lang_name,))
-        self.conn.commit()
-        return cur.fetchone()
+        # Extract the column names
+        #col_names = tuple(elt[0] for elt in cur.description)
+
+        return dict(cur.fetchone())
 
     @check_conn
-    def get_lang_id_only_if_exists(self, lang_name: str) -> int:
-        """Dummy. Dont use it. It does nothing
-
-        Args:
-            lang_name (str): _description_
-
-        Returns:
-            int: _description_
-        """
-        return -1
-        
-        lang_name = lang_name.strip().lower()
+    def get_verse_unique_ids(self, field: Literal["book_id", "chapter_id", "verse_id"]):
         cur = self.conn.cursor()
-        cur.execute("""
-            SELECT id
-            FROM langs
-            WHERE name = %s
-        """,
-        (lang_name,))
-        
-        res = cur.fetchall()
-        if len(res) == 1: return res[0]
-        
-        return -1
+        sql_str = cur.mogrify(
+            """ SELECT DISTINCT %s FROM verses; """, 
+            (AsIs(field),)
+        )
+        cur.execute(sql_str)
+        result = cur.fetchall()
+        logger.debug(sql_str)
+        return result if not result else tuple( i[0] for i in result )
 
     @check_conn
     def insert_new_text(self, data: dict) -> None:

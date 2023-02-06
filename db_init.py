@@ -9,7 +9,7 @@ logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-local_bible_db = BibleDB("0.0.0.0")
+local_bible_db = BibleDB()
 
 texts_dir = f"paralleltext-master/bibles"
 

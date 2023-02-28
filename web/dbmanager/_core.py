@@ -8,7 +8,7 @@ logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-from ._schemas import table_schemas
+from ._schema import execute_from_schema
 
 def check_conn(func):
     def wrapped(self, *args, **kwargs):
@@ -66,22 +66,7 @@ class BibleDB():
 
     @check_conn
     def create_tables(self) -> None:  
-        cur = self.conn.cursor()
-        
-        for table in table_schemas:
-            collumns = ''.join([f"{k} {v}," for k, v in table["collumns"].items()])
-            other = ''.join([f"{val}," for val in table["other"]])
-
-            cur.execute(
-                """
-                CREATE TABLE IF NOT EXISTS "{name}"({collumns})
-                """.format(
-                    name = table["name"],
-                    collumns = str(collumns + other).removesuffix(',')
-                )
-            )
-
-        self.conn.commit()
+        execute_from_schema(self.conn)
     
     @check_conn
     def get_text_list(self, collumns: list[str] = None) -> list[dict]:

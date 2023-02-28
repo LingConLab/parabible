@@ -1,6 +1,8 @@
 services:
   db:
     image: database
+    cpus: 0.2
+    mem_limit: 256m
     container_name: parabible-db
     build: 
       context: ./postgres
@@ -14,6 +16,8 @@ services:
     
   pgAdmin:
     image: dpage/pgadmin4
+    cpus: 0.35
+    mem_limit: 512m
     container_name: parabible-pgAdmin
     env_file:
       - ./postgres/env_file
@@ -23,9 +27,16 @@ services:
       - 80:80
     networks:
       - db_backend
+    # !!!
+    # COMMENT THIS TO ENABLE
+    #profiles:
+    #  - donotstart
+    # !!!
 
   flask-front:
     image: flask-front
+    cpus: 0.2
+    mem_limit: 256m
     container_name: parabible-flask
     depends_on:
       - db
@@ -40,7 +51,7 @@ services:
       - db_backend
 
     # !!!
-    # COMMENT THIS TO ENABLE FRONTEND
+    # COMMENT THIS TO ENABLE
     #profiles:
     #  - donotstart
     # !!!

@@ -24,7 +24,7 @@ services:
     depends_on:
       - db
     ports: 
-      - 80:80
+      - 14001:80
     networks:
       - db_backend
     # !!!
@@ -46,7 +46,7 @@ services:
     env_file:
       - ./web/env_file
     ports:
-      - 5000:5000
+      - 14000:5000
     networks:
       - db_backend
 

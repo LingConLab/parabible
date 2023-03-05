@@ -8,8 +8,6 @@ logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-from ._schema import execute_from_schema
-
 def check_conn(func):
     def wrapped(self, *args, **kwargs):
         if self.conn:
@@ -48,12 +46,10 @@ class BibleDB():
                 logger.info(f"Connected to host {host}")
                 break
             except psycopg2.OperationalError as e:
-                logger.error(f"Failed to connect to the host {host}\n{e}")
+                logger.info(f"Failed to connect to the host option {host}\n{e}")
         else:
             # raise OperationalError exeption
             self.connect(host_options[0])
-
-        self.create_tables()
 
     def connect(self, host):
         return psycopg2.connect(
@@ -63,10 +59,6 @@ class BibleDB():
             host        =   host,
             port        =   self.DB_PORT
         )
-
-    @check_conn
-    def create_tables(self) -> None:  
-        execute_from_schema(self.conn)
     
     @check_conn
     def get_text_list(self, collumns: list[str] = None) -> list[dict]:

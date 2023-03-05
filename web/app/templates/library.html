@@ -35,7 +35,10 @@
             <ul id="item1" class="collapse in list-group">
               {% for text in book_list[book] %}
               <div class="form-check">
-                <li class="list-group-item">{{ text["vernacular_title"] }}
+                <li class="list-group-item">
+                  <b>[{{ text["closest_iso_639_3"] }}]</b>
+                  <i>{{ '"{}"'.format(text['vernacular_title']) if text["vernacular_title"] else "?" }}</i>
+                  ({{ text["year_short"] if text["year_short"] else "?" }})
                   <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
                 </li>
               </div>

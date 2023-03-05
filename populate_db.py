@@ -42,10 +42,12 @@ def get_zip():
 
 def unzip(file_name):
     from zipfile import ZipFile
+    from tqdm import tqdm
     print() 
     logger.info(f"Unzipping {file_name} into {corpus_dir}...")
     with ZipFile(file_name, 'r') as zObj:
-        zObj.extractall(path=corpus_dir)
+        for member in tqdm(zObj.infolist(), desc='Extracting '):
+            zObj.extract(member, path=corpus_dir)
 
 def parse():
     from web.dbmanager import BibleDB

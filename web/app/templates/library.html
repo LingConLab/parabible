@@ -23,11 +23,11 @@
     <div class="col-sm-3 mx-left"></div>
     <div class="col-sm-5 mx-center">
       <form method="post" action="corpus">
-        <label for="ids_input">Verses ids</label>
+        <label for="ids_input">Choose verses</label>
         <br>
         <textarea name="ids_input" rows="3" cols="60">40,1,1; 40,1,2; 40,2,1; 40,2,2</textarea>
         <br>
-        <label>Texts</label>
+        <label>Choose translations</label>
         <ul class="list-group">
           {% for book in book_list %}
           <li class="list-group-item">
@@ -36,10 +36,10 @@
               {% for text in book_list[book] %}
               <div class="form-check">
                 <li class="list-group-item">
+                  <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
                   <b>[{{ text["closest_iso_639_3"] }}]</b>
                   <i>{{ '"{}"'.format(text['vernacular_title']) if text["vernacular_title"] else "?" }}</i>
                   ({{ text["year_short"] if text["year_short"] else "?" }})
-                  <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
                 </li>
               </div>
               {% endfor %}

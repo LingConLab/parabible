@@ -6,6 +6,8 @@ from re import sub as regex_sub
 from pprint import pformat
 import os
 
+from .src import get_iso_lang_name
+
 bible_db = BibleDB()
 
 logger = logging.getLogger(__name__)
@@ -19,6 +21,8 @@ def index():
 @app.route('/library', methods=['get'])
 def library():    
     text_list = bible_db.get_text_list()
+    for t in text_list:
+        t['closest_iso_639_3'] = get_iso_lang_name(t['closest_iso_639_3'])
     logger.debug(f"SELECED texts: {text_list}")
     if text_list:
         return render_template(

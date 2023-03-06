@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
 from typing import Literal
+from collections import defaultdict
 import logging
 
 logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
@@ -265,7 +266,19 @@ class BibleDB():
         )
 
     @check_conn
-    def __insert_translation_meta(self, meta):
+    def __insert_translation_meta(self, meta: dict[str]) -> int:
+        """
+        Args:
+            meta (dict[str]): meta data dict. It will replace missing key values with None.
+
+        Raises:
+            Exception: if db returns anything but integer
+
+        Returns:
+            int: id of the inserted record
+        """        """"""
+        auto_meta = defaultdict(lambda: None)
+        auto_meta.update(meta)
         cursor = self.conn.cursor()
         cursor.execute("""
                 INSERT INTO translations
@@ -294,6 +307,7 @@ class BibleDB():
 
     @check_conn
     def __is_dublicate(self, meta: dict) -> bool:
+        return False
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT id

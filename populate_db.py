@@ -27,13 +27,12 @@ urls = {
     'full': "http://91.200.84.6/parabible-data/full_pb_corpus.zip"
 }
 corpus_dir = Path("corpus-txt")
-corpus_dir.mkdir(parents=True, exist_ok=True)
 
 def get_zip():
-    from wget import download as wget_download
     file = Path(urls[args.mode].split('/')[-1])
     if Path.exists(file):
-        logger.info(f"{file} already exists. Downloading skipped")
+        from wget import download as wget_download
+        logger.info(f"'{file}' already exists. Downloading skipped")
         return file
     else:
         logger.info(f"Downloading {urls[args.mode]}...")
@@ -41,13 +40,20 @@ def get_zip():
     return wget_download(urls[args.mode])
 
 def unzip(file_name):
-    from zipfile import ZipFile
-    from tqdm import tqdm
-    print() 
-    logger.info(f"Unzipping {file_name} into {corpus_dir}...")
-    with ZipFile(file_name, 'r') as zObj:
-        for member in tqdm(zObj.infolist(), desc='Extracting '):
-            zObj.extract(member, path=corpus_dir)
+    if Path.exists(corpus_dir):
+        logger.info(
+            f"'{corpus_dir}' directory already exists. " + \
+            "Unzipping skipped.\n" + \
+            f"Remove '{corpus_dir}' dir if you want to clean unzip '{file_name}'"
+        )
+    else:
+        from zipfile import ZipFile
+        from tqdm import tqdm
+        print() 
+        logger.info(f"Unzipping '{file_name}' into '{corpus_dir}'...")
+        with ZipFile(file_name, 'r') as zObj:
+            for member in tqdm(zObj.infolist(), desc='Extracting '):
+                zObj.extract(member, path=corpus_dir)
 
 def parse():
     from web.dbmanager import BibleDB

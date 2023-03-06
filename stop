@@ -1,6 +1,0 @@
-#!/bin/sh -x
-
-set -e
-
-docker stop parabible-flask
-docker stop parabible-db

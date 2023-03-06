@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 # Section to edit
 __data_dir_name = "data"
 __iso_index_file_name = "iso_639-3_index.json"
+__book_index_file_name = "book_id_index.json"
 
 # Funcs
 def check_dir(dir_path):
@@ -39,17 +40,32 @@ def check_file(file_path, is_critical: bool, do_create_on_missing: bool) -> bool
 parent_dir = Path(__file__).parent
 data_dir = parent_dir.joinpath(Path(__data_dir_name))
 check_dir(data_dir)
-## Iso index file
+## Iso names
 __iso_index_file = data_dir.joinpath(__iso_index_file_name)
 __iso_index_present = check_file(__iso_index_file, is_critical=False, do_create_on_missing=False)
 if __iso_index_present:
     with open(__iso_index_file, 'r', encoding='utf-8') as f:
         __raw = load(f)
-        __index_dict = defaultdict(lambda: "Unknown ISO 639-3 code")
-        __index_dict.update(__raw)
+        __iso_index_dict = defaultdict(lambda: "Unknown ISO 639-3 code")
+        __iso_index_dict.update(__raw)
 
 def get_iso_lang_name(iso_code: str) -> str:
     if __iso_index_present:
-        return __index_dict[iso_code]
+        return __iso_index_dict[iso_code]
     else:
         return iso_code
+    
+## Book names
+__book_index_file = data_dir.joinpath(__book_index_file_name)
+__book_index_present = check_file(__book_index_file, is_critical=False, do_create_on_missing=False)
+if __book_index_present:
+    with open(__book_index_file, 'r', encoding='utf-8') as f:
+        __raw = load(f)
+        __book_index_dict = defaultdict(lambda: "Unknown book id")
+        __book_index_dict.update(__raw)
+
+def get_book_name(book_id: int) -> str:
+    if __iso_index_present:
+        return __book_index_dict[str(book_id)]
+    else:
+        return book_id

@@ -1,58 +1,87 @@
-<!DOCTYPE html>
-<html>
-
-<head>{% extends 'bootstrap/base.html' %}</head>
-
-<body>
-  {% block navbar %}
-  <nav class="navbar navbar-default">
-    <div class="container">
-      <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
-      <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
-        <ul class="nav navbar-nav btn-group">
-          <a href="home"><button class="button">About us</button></a>
-          <a href="library"><button class="button">Search</button></a>
-          <button class="button">Log in</button>
-        </ul>
-      </div>
+{% extends 'bootstrap/base.html' %}
+{% block navbar %}
+<nav class="navbar navbar-default">
+  <div class="container">
+    <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
+    <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
+      <ul class="nav navbar-nav btn-group">
+        <a href="home"><button class="button">About us</button></a>
+        <a href="library"><button class="button">Search</button></a>
+        <button class="button">Log in</button>
+      </ul>
     </div>
-  </nav>
-  {% endblock %}
-  {% block content %}
-  <div class="row d-flex justify-content-center">
-    <div class="col-sm-3 mx-left"></div>
-    <div class="col-sm-5 mx-center">
-      <form method="post" action="corpus">
-        <label for="ids_input">Choose verses</label>
-        <br>
-        <textarea name="ids_input" rows="3" cols="60">40,1,1; 40,1,2; 40,2,1; 40,2,2</textarea>
-        <br>
-        <label>Choose translations</label>
-        <ul class="list-group">
-          {% for book in book_list %}
-          <li class="list-group-item">
-            <a href="#item1" data-toggle="collapse">{{ book }}</a>
-            <ul id="item1" class="collapse in list-group">
-              {% for text in book_list[book] %}
-              <div class="form-check">
-                <li class="list-group-item">
-                  <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
-                  <b>[{{ text["closest_iso_639_3"] }}]</b>
-                  <i>{{ '"{}"'.format(text['vernacular_title']) if text["vernacular_title"] else "?" }}</i>
-                  ({{ text["year_short"] if text["year_short"] else "?" }})
-                </li>
-              </div>
-              {% endfor %}
-            </ul>
-          </li>
-          {% endfor %}
-        </ul>
-        <input type="submit">
-      </form>
-    </div>
-    <div class="col-sm-4 mx-right"></div>
   </div>
-  {% endblock %}
-</body>
+</nav>
+{% endblock %}
+{% block content %}
+<script>
+  function add_verse() {
+    var book_select = document.getElementById("book_select");
+    var chapter_select = document.getElementById("chapter_select");
+    var verse_select = document.getElementById("varse_select");
+    var ids_input = document.getElementById("ids_input");
 
-</html>
+    ids_input.value += "".concat(
+      book_select[book_select.selectedIndex].value,
+      ".",
+      chapter_select[chapter_select.selectedIndex].value,
+      ".",
+      verse_select[verse_select.selectedIndex].value,
+      " "
+    )
+  };
+</script>
+<div class="row d-flex justify-content-center">
+  <div class="col-sm-3 mx-left"></div>
+  <div class="col-sm-5 mx-center">
+    <h3>Choose verses</h3>
+    <div>
+      <label for="book">Book id:</label>
+      <select name="book" id="book_select">
+        {% for b_id in book_ids %}
+          <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
+        {% endfor %}
+      </select>
+      <label for="chapter">Chapter id:</label>
+      <select name="chapter" id="chapter_select">
+        {% for ch_id in chapter_ids %}
+          <option value="{{ ch_id }}">{{ ch_id }}</option>
+        {% endfor %}
+      </select>
+      <label for="varse">Verse id:</label>
+      <select name="varse" id="varse_select">
+        {% for v_id in verse_ids %}
+          <option value="{{ v_id }}">{{ v_id }}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <button onclick="add_verse();">Add verse</button>
+    </div>
+    <form method="post" action="corpus">
+      <textarea name="ids_input" rows="1" cols="60" id="ids_input"></textarea>
+      <h3>Choose translations</h3>
+      <ul class="list-group">
+        {% for book in book_list %}
+        <li class="list-group-item">
+          <a href="#item1" data-toggle="collapse">{{ book }}</a>
+          <ul id="item1" class="collapse in list-group">
+            {% for text in book_list[book] %}
+            <div class="form-check">
+              <li class="list-group-item">
+                <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
+                <b>[{{ text["closest_iso_639_3"] }}]</b>
+                <i>{{ '"{}"'.format(text['vernacular_title']) if text["vernacular_title"] else "?" }}</i>
+                ({{ text["year_short"] if text["year_short"] else "?" }})
+              </li>
+            </div>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ul>
+      <input type="submit">
+    </form>
+  </div>
+  <div class="col-sm-4 mx-right"></div>
+</div>
+{% endblock %}

@@ -160,7 +160,7 @@ class BibleDB():
         cur.execute(sql_str)
         result = cur.fetchall()
         logger.debug(sql_str)
-        return result if not result else tuple( i[0] for i in result )
+        return result if not result else sorted( i[0] for i in result )
 
     @check_conn
     def insert_new_text(self, data: dict) -> None:

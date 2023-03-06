@@ -20,30 +20,6 @@
   {% endblock %}
   {% block content %}
   <div class="d-flex justify-content-around">
-    <div style="margin-inline: 200px;">
-      <form action="">
-        <label for="book">Book id:</label>
-        <select name="book" id="book" disabled>
-          {% for b_id in b_ids %}
-            <option value="{{ b_id }}">{{ b_id }}</option>
-          {% endfor %}
-        </select>
-        <label for="book">Chapter id:</label>
-        <select name="book" id="book" disabled>
-          {% for ch_id in ch_ids %}
-            <option value="{{ ch_id }}">{{ ch_id }}</option>
-          {% endfor %}
-        </select>
-        <label for="book">Verse id:</label>
-        <select name="book" id="book" disabled>
-          {% for v_id in v_ids %}
-            <option value="{{ v_id }}">{{ v_id }}</option>
-          {% endfor %}
-        </select>
-        <br>
-        <input type="submit" value="Add verse" disabled>
-      </form>
-    </div>
     <div style="padding-inline: 50px;">
       <table class="table mx-auto">
         <thead>

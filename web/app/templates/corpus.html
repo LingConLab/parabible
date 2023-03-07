@@ -1,54 +1,44 @@
-<!DOCTYPE html>
-<html>
-
-<head>{% extends 'bootstrap/base.html' %}</head>
-
-<body>
-  {% block navbar %}
-  <nav class="navbar navbar-default">
-    <div class="container">
-      <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
-      <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
-        <ul class="nav navbar-nav btn-group">
-          <a href="home"><button class="button">About us</button></a>
-          <a href="library"><button class="button">Search</button></a>
-          <button class="button">Log in</button>
-        </ul>
-      </div>
-    </div>
-  </nav>
-  {% endblock %}
-  {% block content %}
-  <div class="d-flex justify-content-around">
-    <div style="padding-inline: 50px;">
-      <table class="table mx-auto">
-        <thead>
-          <tr>
-            <th scope="col">id</th>
-            {% for meta_dict in texts_meta %}
-              <th scope="col">[{{ meta_dict["closest_iso_639_3"] }}] <br> {{ meta_dict["vernacular_title"] }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for verse_id in verse_ids %}
-            <tr>
-              <th>{{ verse_id }}</th>
-              {% for meta_dict in texts_meta %}
-                <td>
-                  {{ meta_dict["verses"][verse_id] }}
-                </td>
-              {% endfor %}
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+{% extends 'bootstrap/base.html' %}
+{% block navbar %}
+<nav class="navbar navbar-default">
+  <div class="container">
+    <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
+    <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
+      <ul class="nav navbar-nav btn-group">
+        <a href="home"><button class="button">About us</button></a>
+        <a href="library"><button class="button">Search</button></a>
+        <button class="button">Log in</button>
+      </ul>
     </div>
   </div>
-  {% endblock %}
-  <script>
-
-  </script>
-</body>
-
-</html>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-around">
+  <div style="padding-inline: 50px;">
+    <table class="table mx-auto">
+      <thead>
+        <tr>
+          <th scope="col">Verse</th>
+          {% for meta_dict in texts_meta %}
+            <th title="{{ meta_dict['vernacular_title'] }}"  
+                scope="col">[{{ meta_dict["lang_name"] }}]</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for verse_line in verse_lines %}
+          <tr>
+            <th style="white-space: nowrap">{{ verse_line["id"] }}</th>
+            {% for translation in verse_line["translations"] %}
+              <td>
+                {{ translation }}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

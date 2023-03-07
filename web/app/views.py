@@ -48,25 +48,40 @@ def library():
 @app.route('/corpus', methods=['post', 'get'])
 def corpus():
     if request.method == 'POST':
-        text_ids = [int(i) for i, _ in request.form.items() if str.isalnum(i)]
+        # Get text meta
+        text_ids = [ int(i) for i, _ in request.form.items() if str.isalnum(i) ]
         texts_meta = [ bible_db.get_text_meta(i) for i in text_ids ]
-
+        # Expand text meta
+        for i in range(len(texts_meta)):
+            texts_meta[i]["lang_name"] = get_iso_lang_name(texts_meta[i]["closest_iso_639_3"])
+        # Clear and process verse ids input
         verse_ids_clean_str = regex_sub(f'[^0-9.]+', ' ', request.form["ids_input"])
         verse_ids = filter(lambda x: x != '', verse_ids_clean_str.split(' '))
-        verse_ids = [tuple(map(int, str_id.split('.'))) for str_id in verse_ids]
 
-        logger.debug(f"/corpus recieved ids: {text_ids}")
-        logger.debug(f"verses: {verse_ids}")
+        # Get translation lines from the db
+        verse_lines = []
+        for verse_id in verse_ids:
+            book_id, chapter_id, verse_id = map(int, verse_id.split('.'))
+            readable_id = f"{get_book_name(book_id)} {chapter_id}.{verse_id}"
+            verse_data = {
+                "id": readable_id,
+                "translations": []
+            }
 
-        for meta in texts_meta:
-            meta["verses"] = {}
-            for verse_id in verse_ids:
-                meta["verses"][verse_id] = bible_db.get_verse(verse_id, meta["id"])
+            for text_id in text_ids:
+                verse_data["translations"].append(
+                    bible_db.get_verse(
+                        (book_id, chapter_id, verse_id),
+                        text_id
+                    )
+                )
+
+            verse_lines.append(verse_data)
 
         return render_template(
             "corpus.html",
             texts_meta = texts_meta,
-            verse_ids = verse_ids
+            verse_lines = verse_lines
         )
 
     elif request.method == 'GET':

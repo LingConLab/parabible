@@ -80,7 +80,8 @@
   <div class="col-sm-4 mx-right"></div>
 </div>
 <script>
-  const host = window.location.protocol + "//" + window.location.host;
+  const rootEndpoint = "parabible"
+  const host = window.location.protocol + "//" + window.location.host + "/" + rootEndpoint;
   const langFormatSelect = document.querySelector('#lang_format_select');
   const langSelect = document.querySelector('#lang_select');
   const translationSelect = document.querySelector('#translation_select');

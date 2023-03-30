@@ -7,7 +7,6 @@ import logging
 
 logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 def check_conn(func):
     def wrapped(self, *args, **kwargs):
@@ -62,7 +61,7 @@ class BibleDB():
         )
     
     @check_conn
-    def get_text_list(self, collumns: list[str] = None) -> list[dict]:
+    def get_text_list(self, lang_format: str, lang: str, collumns: list[str] = None) -> list[dict]:
         """Return ids and other collumns of all the texts
 
         Args:
@@ -78,7 +77,8 @@ class BibleDB():
         Returns:
             list[dict]: list of entries dicts. Col name: value
         """
-
+        if not lang_format in ["closest_iso_639_3", "iso_15924"]:
+            return []
         if not collumns:
             collumns = [
                 "closest_iso_639_3",
@@ -89,15 +89,18 @@ class BibleDB():
 
         cur = self.conn.cursor()
 
-        cur.execute(f"""
+        cur.execute("""
             SELECT
-                {''.join([f"{c}," for c in collumns]).removesuffix(',')}
+                %s
             FROM translations
-        """)
-
+            WHERE
+                %s = %s
+        """,
+        (AsIs(''.join([f"{c}," for c in collumns]).removesuffix(',')),
+        AsIs(lang_format), lang))
         result = cur.fetchall()
-        dict_formatted = [{collumns[i]: tup[i] for i in range(len(tup))} for tup in result]
-        return dict_formatted
+        logger.debug(result)
+        return result
 
     @check_conn
     def get_verse(self, verse_id: tuple[int], translation_id: int) -> str:
@@ -222,6 +225,21 @@ class BibleDB():
 
         self.conn.commit()
         #logger.info(f"{len(data['data']['lines'])} verses done!")
+
+    @check_conn
+    def get_langs_list(self, format: Literal["iso_15924", "closest_iso_639_3"]) -> list:
+        cur = self.conn.cursor()
+        sql_str = cur.mogrify(
+            """ SELECT DISTINCT %s FROM translations; """, 
+            (AsIs(format),)
+        )
+        cur.execute(sql_str)
+        result = cur.fetchall()
+        if not result:
+            return result 
+        result = sorted( i[0] for i in result )
+        logger.debug(result)
+        return result
 
     @check_conn
     def __form_verse_values_string(self, data: dict, translation_id: int, cur) -> str:

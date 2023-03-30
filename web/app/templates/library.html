@@ -1,4 +1,7 @@
 {% extends 'bootstrap/base.html' %}
+{% block styles %}
+<link href="static/library.css" rel="stylesheet">
+{% endblock %}
 {% block navbar %}
 <nav class="navbar navbar-default">
   <div class="container">
@@ -14,12 +17,162 @@
 </nav>
 {% endblock %}
 {% block content %}
+<div class="row d-flex justify-content-center">
+  <div class="col-sm-3 mx-left"></div>
+  <div class="col-sm-5 mx-center">
+    <h3>Choose verses</h3>
+    <div class="smallborder selection_box">
+      <div class="selection_item">
+        <label for="book">Book id:</label>
+        <select class="select_cls" name="book" id="book_select">
+          {% for b_id in book_ids %}
+            <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="selection_item">
+        <label for="chapter">Chapter id:</label>
+        <select class="select_cls" name="chapter" id="chapter_select">
+          {% for ch_id in chapter_ids %}
+            <option value="{{ ch_id }}">{{ ch_id }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="selection_item">
+        <label for="varse">Verse id:</label>
+        <select class="select_cls" name="verse" id="verse_select">
+          {% for v_id in verse_ids %}
+            <option value="{{ v_id }}">{{ v_id }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button onclick="add_verse();">Add verse</button>
+    </div>
+    <h3>Choose translations</h3> 
+    <div class="smallborder selection_box">
+      <div class="selection_item">
+        <label for="book">Language format:</label>
+        <select class="select_cls" name="lang_format" id="lang_format_select">
+            <option disabled selected value> -- select an option -- </option>
+          {% for format in lang_formats %}
+            <option value="{{ format[0] }}">{{ format[1]['frontend_name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="selection_item">
+        <label for="book">Language:</label>
+        <select class="select_cls" name="lang" id="lang_select" disabled="disabled">
+          <option disabled selected value> -- select an option -- </option>
+        </select>
+      </div>
+      <div class="selection_item">
+        <label for="book">Translation:</label>
+        <select class="select_cls" name="translation" id="translation_select" disabled="disabled">
+          <option disabled selected value> -- select an option -- </option>
+        </select>
+      </div>
+    </div>
+    <form method="post" action="corpus">
+      <textarea class="smallborder" name="verse_ids_input" rows="1" cols="60" id="verse_ids_input"></textarea>
+      <input type="submit">
+    </form>
+  </div>
+  <div class="col-sm-4 mx-right"></div>
+</div>
 <script>
+  const host = window.location.protocol + "//" + window.location.host;
+  const langFormatSelect = document.querySelector('#lang_format_select');
+  const langSelect = document.querySelector('#lang_select');
+  const translationSelect = document.querySelector('#translation_select');
+  var langFormatValue = null;
+
+  function addOption(parent, label, value) {
+    node = document.createElement("option");
+    node.value = value;
+    textNode = document.createTextNode(label);
+    node.appendChild(textNode);
+    parent.appendChild(node);
+  }
+
+  function wipeOptions(parent) {
+    while (parent.hasChildNodes()) {
+      parent.removeChild(parent.lastChild);
+    }
+    addOption(parent, " -- select an option -- ", "");
+  }
+
+  langFormatSelect.addEventListener('change', () => {
+      updateLangSelect(langFormatSelect.value);
+      wipeOptions(langSelect);
+      wipeOptions(translationSelect);
+      translationSelect.setAttribute('disabled', 'disabled');
+  });
+  langSelect.addEventListener('change', () => {
+      updateTranslationSelect(langSelect.value);
+      wipeOptions(translationSelect);
+  });
+
+  function logRequest(url) {
+    console.log(`[Request] ${url}`);
+  }
+
+  function updateTranslationSelect(lang) {
+    const url = host + `/api/get/translations?format=${langFormatValue}&lang=${lang}`;
+    logRequest(url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      wipeOptions(translationSelect);
+      for (let i = 0; i < json['translations_list'].length; i++) {
+        t_id = json['translations_list'][i][0];
+        t_iso = json['translations_list'][i][1];
+        t_name = (json['translations_list'][i][2] ? json['translations_list'][i][2] : "no title");
+        t_year = json['translations_list'][i][3];
+        t_string = `[${t_iso} | ${t_year}] ${t_name}`;
+        addOption(translationSelect, t_string, t_id);
+      }
+    })
+    .catch((error) => {
+      console.log(`Could not fetch langs: ${error}`);
+      addOption(langSelect, 'Error. See console', 'ERR');
+    });
+    translationSelect.removeAttribute('disabled');
+  }
+
+  function updateLangSelect(langFormat) {
+    const url = host + `/api/get/langs?format=${langFormat}`;
+    logRequest(url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      langFormatValue = json['val_format'];
+      wipeOptions(langSelect);
+      for (let i = 0; i < json['lang_list'].length; i++) {
+        addOption(langSelect, json['lang_list'][i]['label'], json['lang_list'][i]['val']);
+      }
+    })
+    .catch((error) => {
+      console.log(`Could not fetch langs: ${error}`);
+      addOption(langSelect, 'Error. See console', 'ERR');
+    });
+    langSelect.removeAttribute('disabled');
+  }
+
   function add_verse() {
     var book_select = document.getElementById("book_select");
     var chapter_select = document.getElementById("chapter_select");
-    var verse_select = document.getElementById("varse_select");
-    var ids_input = document.getElementById("ids_input");
+    var verse_select = document.getElementById("verse_select");
+    var ids_input = document.getElementById("verse_ids_input");
 
     ids_input.value += "".concat(
       book_select[book_select.selectedIndex].value,
@@ -29,59 +182,6 @@
       verse_select[verse_select.selectedIndex].value,
       " "
     )
-  };
+  }
 </script>
-<div class="row d-flex justify-content-center">
-  <div class="col-sm-3 mx-left"></div>
-  <div class="col-sm-5 mx-center">
-    <h3>Choose verses</h3>
-    <div>
-      <label for="book">Book id:</label>
-      <select name="book" id="book_select">
-        {% for b_id in book_ids %}
-          <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
-        {% endfor %}
-      </select>
-      <label for="chapter">Chapter id:</label>
-      <select name="chapter" id="chapter_select">
-        {% for ch_id in chapter_ids %}
-          <option value="{{ ch_id }}">{{ ch_id }}</option>
-        {% endfor %}
-      </select>
-      <label for="varse">Verse id:</label>
-      <select name="varse" id="varse_select">
-        {% for v_id in verse_ids %}
-          <option value="{{ v_id }}">{{ v_id }}</option>
-        {% endfor %}
-      </select>
-      <br>
-      <button onclick="add_verse();">Add verse</button>
-    </div>
-    <form method="post" action="corpus">
-      <textarea name="ids_input" rows="1" cols="60" id="ids_input"></textarea>
-      <h3>Choose translations</h3>
-      <ul class="list-group">
-        {% for book in book_list %}
-        <li class="list-group-item">
-          <a href="#item1" data-toggle="collapse">{{ book }}</a>
-          <ul id="item1" class="collapse in list-group">
-            {% for text in book_list[book] %}
-            <div class="form-check">
-              <li class="list-group-item">
-                <input type="checkbox" class="form-check-input" name="{{ text['id'] }}">
-                <b>[{{ text["closest_iso_639_3"] }}]</b>
-                <i>{{ '"{}"'.format(text['vernacular_title']) if text["vernacular_title"] else "?" }}</i>
-                ({{ text["year_short"] if text["year_short"] else "?" }})
-              </li>
-            </div>
-            {% endfor %}
-          </ul>
-        </li>
-        {% endfor %}
-      </ul>
-      <input type="submit">
-    </form>
-  </div>
-  <div class="col-sm-4 mx-right"></div>
-</div>
 {% endblock %}

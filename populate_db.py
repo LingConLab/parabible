@@ -29,9 +29,9 @@ urls = {
 corpus_dir = Path("corpus-txt")
 
 def get_zip():
+    from wget import download as wget_download
     file = Path(urls[args.mode].split('/')[-1])
     if Path.exists(file):
-        from wget import download as wget_download
         logger.info(f"'{file}' already exists. Downloading skipped")
         return file
     else:

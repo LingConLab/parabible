@@ -52,8 +52,8 @@ services:
 
     # !!!
     # COMMENT THIS TO ENABLE
-    #profiles:
-    #  - donotstart
+    profiles:
+      - donotstart
     # !!!
 
 networks:

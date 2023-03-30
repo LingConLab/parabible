@@ -310,10 +310,10 @@ class BibleDB():
                 RETURNING id
             """,
             (
-                meta["closest iso 639-3"], meta["iso_15924"],
-                meta["year_short"], meta["year_long"],
-                meta["vernacular_title"], meta["english_title"], meta["url"],
-                meta["copyright_short"], meta["copyright_long"], meta["notes"]
+                auto_meta["closest iso 639-3"], auto_meta["iso_15924"],
+                auto_meta["year_short"], auto_meta["year_long"],
+                auto_meta["vernacular_title"], auto_meta["english_title"], auto_meta["url"],
+                auto_meta["copyright_short"], auto_meta["copyright_long"], auto_meta["notes"]
             )
         )
         self.conn.commit()

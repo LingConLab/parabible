@@ -6,7 +6,7 @@ from re import sub as regex_sub
 from .src import get_book_name, get_iso_lang_name, get_book_ids, language_format_options
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 @app.route('/')
 @app.route('/home')

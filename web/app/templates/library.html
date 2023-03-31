@@ -105,6 +105,11 @@
     addOption(parent, " -- select an option -- ", "");
   }
 
+  function selectLoadingState(parent) {
+    wipeOptions(parent);
+    addOption(parent, " -- Loading ... -- ", "");
+  }
+
   // verses
   bookSelect.addEventListener('change', () => {
       updateChapterSelect(bookSelect.value);
@@ -134,6 +139,7 @@
 
   function updateVerseSelect(book_id, chapter_id) {
     const url = host + `/api/get/verses?book_id=${book_id}&chapter_id=${chapter_id}`;
+    selectLoadingState(verseSelect);
     logRequest(url);
     fetch(url)
     .then((response) => {
@@ -157,6 +163,7 @@
 
   function updateChapterSelect(book_id) {
     const url = host + `/api/get/chapters?book_id=${book_id}`;
+    selectLoadingState(chapterSelect);
     logRequest(url);
     fetch(url)
     .then((response) => {
@@ -180,6 +187,7 @@
 
   function updateTranslationSelect(lang) {
     const url = host + `/api/get/translations?format=${langFormatValue}&lang=${lang}`;
+    selectLoadingState(translationSelect);
     logRequest(url);
     fetch(url)
     .then((response) => {
@@ -208,6 +216,7 @@
 
   function updateLangSelect(langFormat) {
     const url = host + `/api/get/langs?format=${langFormat}`;
+    selectLoadingState(langSelect);
     logRequest(url);
     fetch(url)
     .then((response) => {

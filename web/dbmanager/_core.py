@@ -154,15 +154,29 @@ class BibleDB():
         return dict(cur.fetchone())
 
     @check_conn
-    def get_verse_unique_ids(self, field: Literal["book_id", "chapter_id", "verse_id"]):
+    def get_chapters(self, book_id: int):
         cur = self.conn.cursor()
-        sql_str = cur.mogrify(
-            """ SELECT DISTINCT %s FROM verses; """, 
-            (AsIs(field),)
+        cur.execute(
+            """ SELECT chapter_id FROM verses
+                WHERE book_id = %s
+                GROUP BY chapter_id; """, 
+            (book_id,)
         )
-        cur.execute(sql_str)
         result = cur.fetchall()
-        logger.debug(sql_str)
+        return result if not result else sorted( i[0] for i in result )
+    
+    @check_conn
+    def get_verses(self, book_id: int, chapter_id: int):
+        cur = self.conn.cursor()
+        cur.execute(
+            """ SELECT verse_id FROM verses
+                WHERE
+                    book_id = %s AND
+                    chapter_id = %s
+                GROUP BY verse_id; """, 
+            (book_id, chapter_id)
+        )
+        result = cur.fetchall()
         return result if not result else sorted( i[0] for i in result )
 
     @check_conn

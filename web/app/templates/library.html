@@ -25,6 +25,7 @@
       <div class="selection_item">
         <label for="book">Book id:</label>
         <select class="select_cls" name="book" id="book_select">
+          <option disabled selected value> -- select an option -- </option>
           {% for b_id in book_ids %}
             <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
           {% endfor %}
@@ -32,18 +33,14 @@
       </div>
       <div class="selection_item">
         <label for="chapter">Chapter id:</label>
-        <select class="select_cls" name="chapter" id="chapter_select">
-          {% for ch_id in chapter_ids %}
-            <option value="{{ ch_id }}">{{ ch_id }}</option>
-          {% endfor %}
+        <select class="select_cls" name="chapter" id="chapter_select" disabled="disabled">
+          <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
       <div class="selection_item">
         <label for="varse">Verse id:</label>
-        <select class="select_cls" name="verse" id="verse_select">
-          {% for v_id in verse_ids %}
-            <option value="{{ v_id }}">{{ v_id }}</option>
-          {% endfor %}
+        <select class="select_cls" name="verse" id="verse_select" disabled="disabled">
+          <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
       <button onclick="add_verse();">Add verse</button>
@@ -53,7 +50,7 @@
       <div class="selection_item">
         <label for="book">Language format:</label>
         <select class="select_cls" name="lang_format" id="lang_format_select">
-            <option disabled selected value> -- select an option -- </option>
+          <option disabled selected value> -- select an option -- </option>
           {% for format in lang_formats %}
             <option value="{{ format[0] }}">{{ format[1]['frontend_name'] }}</option>
           {% endfor %}
@@ -80,11 +77,17 @@
   <div class="col-sm-4 mx-right"></div>
 </div>
 <script>
-  const rootEndpoint = "parabible"
-  const host = window.location.protocol + "//" + window.location.host + "/" + rootEndpoint;
+  const rootEndpoint = ""
+  const host = window.location.protocol + "//" + window.location.host;
+  
+  const bookSelect = document.querySelector('#book_select');
+  const chapterSelect = document.querySelector('#chapter_select');
+  const verseSelect = document.querySelector('#verse_select');
+
   const langFormatSelect = document.querySelector('#lang_format_select');
   const langSelect = document.querySelector('#lang_select');
   const translationSelect = document.querySelector('#translation_select');
+
   var langFormatValue = null;
 
   function addOption(parent, label, value) {
@@ -102,6 +105,18 @@
     addOption(parent, " -- select an option -- ", "");
   }
 
+  // verses
+  bookSelect.addEventListener('change', () => {
+      updateChapterSelect(bookSelect.value);
+      wipeOptions(chapterSelect);
+      wipeOptions(verseSelect);
+      verseSelect.setAttribute('disabled', 'disabled');
+  });
+  chapterSelect.addEventListener('change', () => {
+      updateVerseSelect(bookSelect.value, chapterSelect.value);
+      wipeOptions(verseSelect);
+  });
+  // translations
   langFormatSelect.addEventListener('change', () => {
       updateLangSelect(langFormatSelect.value);
       wipeOptions(langSelect);
@@ -115,6 +130,52 @@
 
   function logRequest(url) {
     console.log(`[Request] ${url}`);
+  }
+
+  function updateVerseSelect(book_id, chapter_id) {
+    const url = host + `/api/get/verses?book_id=${book_id}&chapter_id=${chapter_id}`;
+    logRequest(url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      wipeOptions(verseSelect);
+      for (let i = 0; i < json['verses'].length; i++) {
+        addOption(verseSelect, json['verses'][i], json['verses'][i]);
+      }
+    })
+    .catch((error) => {
+      console.log(`Could not fetch langs: ${error}`);
+      addOption(verseSelect, 'Error. See console', 'ERR');
+    });
+    verseSelect.removeAttribute('disabled');
+  }
+
+  function updateChapterSelect(book_id) {
+    const url = host + `/api/get/chapters?book_id=${book_id}`;
+    logRequest(url);
+    fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((json) => {
+      wipeOptions(chapterSelect);
+      for (let i = 0; i < json['chapters'].length; i++) {
+        addOption(chapterSelect, json['chapters'][i], json['chapters'][i]);
+      }
+    })
+    .catch((error) => {
+      console.log(`Could not fetch langs: ${error}`);
+      addOption(chapterSelect, 'Error. See console', 'ERR');
+    });
+    chapterSelect.removeAttribute('disabled');
   }
 
   function updateTranslationSelect(lang) {

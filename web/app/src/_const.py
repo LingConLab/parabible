@@ -9,6 +9,17 @@ logger = logging.getLogger(__name__)
 __data_dir_name = "data"
 __iso_index_file_name = "iso_639-3_index.json"
 __book_index_file_name = "book_id_index.json"
+language_format_options = {
+    'closest_iso_639_3': {
+        'frontend_name': 'Closest ISO 639-3'
+    },
+    'iso_15924': {
+        'frontend_name': 'ISO 15924'
+    }, 
+    'lang_name': {
+        'frontend_name': 'Literal language name'
+    }
+}
 
 # Funcs
 def check_dir(dir_path):
@@ -61,11 +72,18 @@ __book_index_present = check_file(__book_index_file, is_critical=False, do_creat
 if __book_index_present:
     with open(__book_index_file, 'r', encoding='utf-8') as f:
         __raw = load(f)
+        __processed_dict = { int(k): v for k, v in __raw.items() }
         __book_index_dict = defaultdict(lambda: "Unknown book id")
-        __book_index_dict.update(__raw)
+        __book_index_dict.update(__processed_dict)
 
 def get_book_name(book_id: int) -> str:
     if __iso_index_present:
-        return __book_index_dict[str(book_id)]
+        return __book_index_dict[book_id]
     else:
         return book_id
+
+def get_book_ids() -> list[int]:
+    if __iso_index_present:
+        return list(__book_index_dict.keys())
+    else:
+        return []

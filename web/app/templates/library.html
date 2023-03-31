@@ -98,39 +98,43 @@
     parent.appendChild(node);
   }
 
-  function wipeOptions(parent) {
+  function wipeAllOptions(parent) {
     while (parent.hasChildNodes()) {
       parent.removeChild(parent.lastChild);
     }
+  }
+
+  function wipeOptions(parent, disable = false) {
+    wipeAllOptions(parent);
     addOption(parent, " -- select an option -- ", "");
+    if (disable) parent.setAttribute('disabled', 'disabled');
   }
 
   function selectLoadingState(parent) {
-    wipeOptions(parent);
+    wipeAllOptions(parent);
     addOption(parent, " -- Loading ... -- ", "");
+  }
+
+  function errorSelect(parent) {
+    wipeAllOptions(parent);
+    addOption(parent, " -- Error. See console logs. -- ", "");
   }
 
   // verses
   bookSelect.addEventListener('change', () => {
       updateChapterSelect(bookSelect.value);
-      wipeOptions(chapterSelect);
-      wipeOptions(verseSelect);
-      verseSelect.setAttribute('disabled', 'disabled');
+      wipeOptions(verseSelect, disable=true);
   });
   chapterSelect.addEventListener('change', () => {
       updateVerseSelect(bookSelect.value, chapterSelect.value);
-      wipeOptions(verseSelect);
   });
   // translations
   langFormatSelect.addEventListener('change', () => {
       updateLangSelect(langFormatSelect.value);
-      wipeOptions(langSelect);
-      wipeOptions(translationSelect);
-      translationSelect.setAttribute('disabled', 'disabled');
+      wipeOptions(translationSelect, disable=true);
   });
   langSelect.addEventListener('change', () => {
       updateTranslationSelect(langSelect.value);
-      wipeOptions(translationSelect);
   });
 
   function logRequest(url) {
@@ -156,7 +160,7 @@
     })
     .catch((error) => {
       console.log(`Could not fetch langs: ${error}`);
-      addOption(verseSelect, 'Error. See console', 'ERR');
+      errorSelect(verseSelect);
     });
     verseSelect.removeAttribute('disabled');
   }
@@ -180,7 +184,7 @@
     })
     .catch((error) => {
       console.log(`Could not fetch langs: ${error}`);
-      addOption(chapterSelect, 'Error. See console', 'ERR');
+      errorSelect(chapterSelect);
     });
     chapterSelect.removeAttribute('disabled');
   }
@@ -209,7 +213,7 @@
     })
     .catch((error) => {
       console.log(`Could not fetch langs: ${error}`);
-      addOption(langSelect, 'Error. See console', 'ERR');
+      errorSelect(langSelect);
     });
     translationSelect.removeAttribute('disabled');
   }
@@ -234,7 +238,7 @@
     })
     .catch((error) => {
       console.log(`Could not fetch langs: ${error}`);
-      addOption(langSelect, 'Error. See console', 'ERR');
+      errorSelect(langSelect);
     });
     langSelect.removeAttribute('disabled');
   }

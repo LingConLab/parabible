@@ -1,5 +1,6 @@
 from pprint import pprint
 from pathlib import Path
+from psycopg2.errors import OperationalError
 import argparse
 import logging
 
@@ -29,6 +30,7 @@ urls = {
 corpus_dir = Path("corpus-txt")
 
 def get_zip():
+    """Downloads zip file from the server."""
     from wget import download as wget_download
     file = Path(urls[args.mode].split('/')[-1])
     if Path.exists(file):
@@ -40,28 +42,36 @@ def get_zip():
     return wget_download(urls[args.mode])
 
 def unzip(file_name):
+    """Extracts zip file."""
     if Path.exists(corpus_dir):
         logger.info(
             f"'{corpus_dir}' directory already exists. " + \
-            "Unzipping skipped.\n" + \
+            "Unzipping skipped. " + \
             f"Remove '{corpus_dir}' dir if you want to clean unzip '{file_name}'"
         )
-    else:
-        from zipfile import ZipFile
-        from tqdm import tqdm
-        print() 
-        logger.info(f"Unzipping '{file_name}' into '{corpus_dir}'...")
-        with ZipFile(file_name, 'r') as zObj:
-            for member in tqdm(zObj.infolist(), desc='Extracting '):
-                zObj.extract(member, path=corpus_dir)
+        return
+    from zipfile import ZipFile
+    from tqdm import tqdm
+    print() 
+    logger.info(f"Unzipping '{file_name}' into '{corpus_dir}'...")
+    with ZipFile(file_name, 'r') as zObj:
+        for member in tqdm(zObj.infolist(), desc='Extracting '):
+            zObj.extract(member, path=corpus_dir)
 
 def parse():
+    """Connects to the DB and parses extracted content there."""
     from web.dbmanager import BibleDB
     from web.dbmanager.parser import parser as db_parser
 
     logger.info(f"Parsing .txt files into DB...")
 
-    local_bible_db = BibleDB()
+    try:
+        local_bible_db = BibleDB()
+    except OperationalError as e:
+        logger.error(e)
+        logger.error("Cant connect to the database. Is postgres DB up?")
+        logger.info("Make sure that the database is up")
+        return
     auto_commit_threshold = 100
     iter = 1
     for text_data, file_name in db_parser.parsed_texts(corpus_dir):

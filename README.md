@@ -1,99 +1,43 @@
-# Overview
+# Quick start
 Consists of a flask python app and a postresql database. They exist in two different docker containers. Flask app refers to the DB via local network.
 
 For a quick start run these:
 <pre>
 docker-compose up
-python3 db_init.py
+pip3 install wget tqdm psycopg2
+python3 populate_db.py -m full
 </pre>
 
-# Docker handling shell/python scripts
+# Overview
 
-These scripts help handle operations with docker.
+Parabible is a project developed at HSE Moscow University that provides a user-friendly tool for working with a massive parallel bible translations corpus. It features a Flask web GUI and data storage in a PostgreSQL database, enabling users to easily access specific verses from specific translations and compare them side by side.
 
-~~Before running `docker-compose up` make sure to run `init` script first. This will launch docker container and parse and insert all the data into database.~~ (This isnt working for now)
+It consists of 1846 translations which are taken from [cysouw](https://github.com/cysouw). 
 
-* `db_init.py`
-    * Parses data from *parser/paralleltext-matser/bibles/corpus/* to the database. You dont need to run itevery time you launch docker. Only on first launch or if you have updated curpus (the mentioned derectories). **Database docker container must be accessable and running!**
-* `stop` sh script
-    * stops all parabible's running containers
-* `vipe` sh scrips
-    * stops all parabible's running containers, deletes containers, deletes images
-    * better use `stop` bc after `vipe` it will rebuild images (it takes some time). But if you want to be sure that everything is up to date then use `vipe`
+This project is present as 2 (3) connected docker containers.
 
-~~*(Id like it to run automatically on postgres initialisation but I wasnt able to find python init scripts support)*~~
-
-# Surface documentstion
-## parser
-Parses bible texts from [Michel Cysouw's repo](https://github.com/cysouw/multialignment-of-paralleltext) data into python dictionary that can be inserted into the DB. Now it saves parsed data as json files.
-
-**TODO** handy script that inserts data into DB
+ - python flask container
+ - postgresql container
+ - pgAdmin container (optional)
 
 ## postgres
-Contains docker files
+*postgres/* Contains docker files and sql schema file for the postgres container.
 
 ## web
-Flask web app, its docker files,
+*web/* contains the actual web python flask app and docker files for the python flask container.
 
-`dbmanager` module that provides access to the DB
+## pgadmin
+Optional container to access the database admin panel. It may be disabled/enabled in *compose.yml* file in the `pgAdmin` section:
+<pre>
+pgAdmin:
+
+    ...
+    
+    # !!!
+    # COMMENT THIS TO ENABLE
+    profiles:
+      - donotstart
+    # !!!
+</pre>
 
 ***For the details see readme files in other dirs***
-
-
-```
-parabible
-├─ .gitignore
-├─ README.md
-├─ compose.yml
-├─ db_init.py
-├─ init
-├─ paralleltext-master
-│  ├─ .gitignore
-│  ├─ README.md
-│  ├─ bibleParse.py
-│  └─ bibles
-│     ├─ bul-x-bible-newworld.txt
-│     ├─ deu-x-bible-neue.txt
-│     ├─ eng-x-bible-worldwide.txt
-│     ├─ jpn-x-bible-newworld.txt
-│     └─ pol-x-bible-newworld.txt
-├─ postgres
-│  ├─ Dockerfile
-│  ├─ README.md
-│  └─ env_file
-├─ stop
-├─ vipe
-└─ web
-   ├─ Dockerfile
-   ├─ README.md
-   ├─ app
-   │  ├─ __init__.py
-   │  ├─ __pycache__
-   │  ├─ static
-   │  │  ├─ EBGaramond-Regular.ttf
-   │  │  └─ style.css
-   │  ├─ templates
-   │  │  ├─ corpus.html
-   │  │  ├─ home.html
-   │  │  ├─ index.html
-   │  │  └─ library.html
-   │  └─ views.py
-   ├─ dbmanager
-   │  ├─ __init__.py
-   │  ├─ __pycache__
-   │  ├─ _core.py
-   │  ├─ _schemas.py
-   │  ├─ data
-   │  │  └─ schemas.json
-   │  └─ parser
-   │     ├─ README.md
-   │     ├─ __init__.py
-   │     ├─ __pycache__
-   │     ├─ faced_problems.md
-   │     ├─ line_blacklist.py
-   │     └─ parser.py
-   ├─ env_file
-   ├─ requirements.txt
-   └─ run.py
-
-```

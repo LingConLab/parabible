@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 # Section to edit
 __data_dir_name = "data"
 __schema_file_name = "schema.sql"
+NONE_LABEL = "Empty"
 
 # Funcs
 def check_dir(dir_path):

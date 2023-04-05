@@ -5,6 +5,8 @@ from typing import Literal
 from collections import defaultdict
 import logging
 
+from ._const import NONE_LABEL
+
 logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -251,6 +253,7 @@ class BibleDB():
         result = cur.fetchall()
         if not result:
             return result 
+        result = map(lambda x: x if x else NONE_LABEL, result)
         result = sorted( i[0] for i in result )
         logger.debug(result)
         return result

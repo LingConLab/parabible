@@ -14,6 +14,8 @@ Parabible is a project developed at HSE Moscow University that provides a user-f
 
 It consists of 1846 translations which are taken from [cysouw](https://github.com/cysouw). 
 
+Live up to date preview : http://91.200.84.6/parabible/
+
 This project is present as 2 (3) connected docker containers.
 
  - python flask container

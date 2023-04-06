@@ -1,0 +1,20 @@
+* {
+    border: 0px dotted red;
+}
+
+.smallborder {
+    border: 1px solid black;
+}
+
+.select_cls {
+
+}
+
+.selection_box {
+    padding: 20px;
+    background-color: rgb(186, 210, 253);
+}
+
+.selection_item {
+    padding: 10px;
+}

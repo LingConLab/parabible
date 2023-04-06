@@ -1,32 +1,60 @@
 services:
   db:
     image: database
+    cpus: 0.2
+    mem_limit: 256m
     container_name: parabible-db
-    hostname: parabible-postgresql
     build: 
       context: ./postgres
-    ports: 
-      - 5432:5432
     env_file:
       - ./postgres/env_file
     command: -p 5432
+    ports:
+      - 5432:5432
     networks:
       - db_backend
     
+  pgAdmin:
+    image: dpage/pgadmin4
+    cpus: 0.35
+    mem_limit: 512m
+    container_name: parabible-pgAdmin
+    env_file:
+      - ./postgres/env_file
+    depends_on:
+      - db
+    ports: 
+      - 14001:80
+    networks:
+      - db_backend
+    # !!!
+    # COMMENT THIS TO ENABLE
+    #profiles:
+    #  - donotstart
+    # !!!
+
   flask-front:
     image: flask-front
+    cpus: 0.2
+    mem_limit: 256m
     container_name: parabible-flask
     depends_on:
       - db
     restart: on-failure:5 
     build:
       context: ./web
-    ports:
-      - 5000:5000
     env_file:
       - ./web/env_file
+    ports:
+      - 14000:5000
     networks:
       - db_backend
+
+    # !!!
+    # COMMENT THIS TO ENABLE
+    #profiles:
+    #  - donotstart
+    # !!!
 
 networks:
   db_backend:

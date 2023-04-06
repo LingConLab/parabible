@@ -1,4 +1,6 @@
-*.pyc
-paralleltext-master.exe
 tsa/
 .vscode/
+corpus-txt/
+
+*.zip
+*.pyc

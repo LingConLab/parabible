@@ -1,58 +1,69 @@
 import psycopg2
+from psycopg2.extras import RealDictCursor, DictCursor
+from psycopg2.extensions import AsIs
+from typing import Literal
+from collections import defaultdict
 import logging
 
-logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+from ._const import NONE_LABEL
 
-from ._schemas import table_schemas
+logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def check_conn(func):
+    def wrapped(self, *args, **kwargs):
+        if self.conn:
+            logger.debug(f"Connection is present. {self.conn}")
+            return func(self, *args, **kwargs)
+        else:
+            logger.fatal(f"Attempted to access database with no connection to the database.{args}")
+            logger.info(f"Trying to reconnect")
+            try:
+                self.conn = self.connect(self.DB_HOST)
+            except psycopg2.OperationalError as e:
+                logger.critical(f"Failed to reconnect to the database {e}")
+                self.conn = None
+            
+    return wrapped
 
 class BibleDB():
-    DB_NAME = "parabible"
-    DB_USER = "dev"
-    DB_PASS = "dev"
-    DB_HOST = "parabible-postgresql"; ALT_DB_HOST = "0.0.0.0"
-    DB_PORT = "5432"
+    def __init__(self, host_options: list = None) -> None:
+        """Initializates connection and creates tables if dont exist"""
 
-    def __init__(self) -> None:
-        """Initializates connection and creates tables if dont exist
-        """
-        try:
-            self.conn = psycopg2.connect(
-                database    =   self.DB_NAME,
-                user        =   self.DB_USER,
-                password    =   self.DB_PASS,
-                host        =   self.DB_HOST,
-                port        =   self.DB_PORT
-            )
-        except psycopg2.OperationalError:
-            logger.debug(f"{self.DB_HOST} is unreachable. Trying {self.ALT_DB_HOST}")
-            self.conn = psycopg2.connect(
-                database    =   self.DB_NAME,
-                user        =   self.DB_USER,
-                password    =   self.DB_PASS,
-                host        =   self.ALT_DB_HOST,
-                port        =   self.DB_PORT
-            )
-        self.create_tables()
+        if not host_options:
+            host_options = []
 
-    def create_tables(self) -> None:  
-        cur = self.conn.cursor()
-        
-        for table in table_schemas:
-            collumns = ''.join([f"{k} {v}," for k, v in table["collumns"].items()])
-            other = ''.join([f"{val}," for val in table["other"]])
+        host_options.append('0.0.0.0')
+        host_options.append('localhost')
+        host_options.append('db')
 
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS "{name}"({collumns})
-            """.format(
-                name = table["name"],
-                collumns = str(collumns + other).removesuffix(',')
-            ))
+        self.DB_NAME = "parabible"
+        self.DB_USER = "dev"
+        self.DB_PASS = "dev"
+        self.DB_PORT = "5432"
 
-        self.conn.commit()
+        for host in host_options:
+            try:
+                self.conn = self.connect(host)
+                logger.info(f"Connected to host {host}")
+                break
+            except psycopg2.OperationalError as e:
+                logger.info(f"Failed to connect to the host option {host}\n{e}")
+        else:
+            # raise OperationalError exeption
+            self.connect(host_options[0])
 
-    def get_text_list(self, collumns: list[str] = None) -> list[dict]:
+    def connect(self, host):
+        return psycopg2.connect(
+            database    =   self.DB_NAME,
+            user        =   self.DB_USER,
+            password    =   self.DB_PASS,
+            host        =   host,
+            port        =   self.DB_PORT
+        )
+    
+    @check_conn
+    def get_text_list(self, lang_format: str, lang: str, collumns: list[str] = None) -> list[dict]:
         """Return ids and other collumns of all the texts
 
         Args:
@@ -68,7 +79,8 @@ class BibleDB():
         Returns:
             list[dict]: list of entries dicts. Col name: value
         """
-
+        if not lang_format in ["closest_iso_639_3", "iso_15924"]:
+            return []
         if not collumns:
             collumns = [
                 "closest_iso_639_3",
@@ -79,16 +91,21 @@ class BibleDB():
 
         cur = self.conn.cursor()
 
-        cur.execute(f"""
+        cur.execute("""
             SELECT
-                {''.join([f"{c}," for c in collumns]).removesuffix(',')}
+                %s
             FROM translations
-        """)
-
+            WHERE
+                %s = %s
+        """,
+        (AsIs(''.join([f"{c}," for c in collumns]).removesuffix(',')),
+        AsIs(lang_format), lang))
         result = cur.fetchall()
-        return [{collumns[i]: tup[i] for i in range(len(tup))} for tup in result]
+        logger.debug(result)
+        return result
 
-    def get_verse(self, book_id: int, chapter_id: int, verse_id: int, translation_id: int) -> str:
+    @check_conn
+    def get_verse(self, verse_id: tuple[int], translation_id: int) -> str:
         """Get verse text in specific translation
 
         Args:
@@ -100,68 +117,71 @@ class BibleDB():
         Returns:
             str: text of the verse
         """
+    
+        logger.debug(f"SELECT verse with id {verse_id} translation {translation_id}")
         cur = self.conn.cursor()
 
-        cur.execute("""
-            SELECT line from verses
-            WHERE 
-                book_id = %s AND
-                chapter_id = %s AND
-                verse_id = %s AND
-                translation_id = %s
-        """, (book_id, chapter_id, verse_id, translation_id))
+        cur.execute(
+            """
+                SELECT line FROM verses
+                WHERE 
+                    book_id = %s AND
+                    chapter_id = %s AND
+                    verse_id = %s AND
+                    translation_id = %s
+            """, (verse_id[0], verse_id[1], verse_id[2], translation_id))
 
-        return cur.fetchall()
+        result = cur.fetchone()
+        return result[0] if result else result
 
-    def get_lang_id(self, lang_name: str) -> int:
-        """Dummy. Dont use it. It does nothing
+    @check_conn
+    def get_text_meta(self, id: int) -> dict[str, any]:
+        """Get meta of the text by its id
 
         Args:
-            lang_name (str): _description_
+            id (int): Id of the text
 
         Returns:
-            int: _description_
+            dict[str, any]: Meta of the text
         """
-        return -1
-        existing = self.get_lang_id_only_if_exists(lang_name=lang_name)
-        if existing >= 0: return existing
+        cur = self.conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(
+            """ SELECT * FROM translations WHERE id = %s; """,
+            (id,)
+        )
 
+        # Extract the column names
+        #col_names = tuple(elt[0] for elt in cur.description)
+
+        return dict(cur.fetchone())
+
+    @check_conn
+    def get_chapters(self, book_id: int):
         cur = self.conn.cursor()
-        cur.execute("""
-            INSERT INTO langs
-            (name)
-            VALUES
-            (%s)
-            RETURNING id
-        """, (lang_name,))
-        self.conn.commit()
-        return cur.fetchone()
-
-    def get_lang_id_only_if_exists(self, lang_name: str) -> int:
-        """Dummy. Dont use it. It does nothing
-
-        Args:
-            lang_name (str): _description_
-
-        Returns:
-            int: _description_
-        """
-        return -1
-        
-        lang_name = lang_name.strip().lower()
+        cur.execute(
+            """ SELECT chapter_id FROM verses
+                WHERE book_id = %s
+                GROUP BY chapter_id; """, 
+            (book_id,)
+        )
+        result = cur.fetchall()
+        return result if not result else sorted( i[0] for i in result )
+    
+    @check_conn
+    def get_verses(self, book_id: int, chapter_id: int):
         cur = self.conn.cursor()
-        cur.execute("""
-            SELECT id
-            FROM langs
-            WHERE name = %s
-        """,
-        (lang_name,))
-        
-        res = cur.fetchall()
-        if len(res) == 1: return res[0]
-        
-        return -1
+        cur.execute(
+            """ SELECT verse_id FROM verses
+                WHERE
+                    book_id = %s AND
+                    chapter_id = %s
+                GROUP BY verse_id; """, 
+            (book_id, chapter_id)
+        )
+        result = cur.fetchall()
+        return result if not result else sorted( i[0] for i in result )
 
+    @check_conn
     def insert_new_text(self, data: dict) -> None:
         """Loads new text into db
 
@@ -222,6 +242,23 @@ class BibleDB():
         self.conn.commit()
         #logger.info(f"{len(data['data']['lines'])} verses done!")
 
+    @check_conn
+    def get_langs_list(self, format: Literal["iso_15924", "closest_iso_639_3"]) -> list:
+        cur = self.conn.cursor()
+        sql_str = cur.mogrify(
+            """ SELECT DISTINCT %s FROM translations; """, 
+            (AsIs(format),)
+        )
+        cur.execute(sql_str)
+        result = cur.fetchall()
+        if not result:
+            return result 
+        result = map(lambda x: x if x else NONE_LABEL, result)
+        result = sorted( i[0] for i in result )
+        logger.debug(result)
+        return result
+
+    @check_conn
     def __form_verse_values_string(self, data: dict, translation_id: int, cur) -> str:
         return cur.mogrify(
             "(%s, %s, %s, %s, %s)",
@@ -232,6 +269,7 @@ class BibleDB():
             )
         )
 
+    @check_conn
     def __insert_verse(self, data: dict, translation_id: int, cur):
         values_string = self.__form_verse_values_string(data, translation_id, cur)
         cur.execute(b"""
@@ -241,6 +279,7 @@ class BibleDB():
                 """ + values_string
         )
 
+    @check_conn
     def __insert_verse_bulk(self, data_list: list[dict], begin: int, end: int, translation_id: int, cur):
         """`begin`, `end` are indexes of current window.
         In order to not use additional memory.
@@ -261,7 +300,20 @@ class BibleDB():
                 """ + values_string + b" ON CONFLICT DO NOTHING"
         )
 
-    def __insert_translation_meta(self, meta):
+    @check_conn
+    def __insert_translation_meta(self, meta: dict[str]) -> int:
+        """
+        Args:
+            meta (dict[str]): meta data dict. It will replace missing key values with None.
+
+        Raises:
+            Exception: if db returns anything but integer
+
+        Returns:
+            int: id of the inserted record
+        """        """"""
+        auto_meta = defaultdict(lambda: None)
+        auto_meta.update(meta)
         cursor = self.conn.cursor()
         cursor.execute("""
                 INSERT INTO translations
@@ -275,10 +327,10 @@ class BibleDB():
                 RETURNING id
             """,
             (
-                meta["closest iso 639-3"], meta["iso_15924"],
-                meta["year_short"], meta["year_long"],
-                meta["vernacular_title"], meta["english_title"], meta["url"],
-                meta["copyright_short"], meta["copyright_long"], meta["notes"]
+                auto_meta["closest iso 639-3"], auto_meta["iso_15924"],
+                auto_meta["year_short"], auto_meta["year_long"],
+                auto_meta["vernacular_title"], auto_meta["english_title"], auto_meta["url"],
+                auto_meta["copyright_short"], auto_meta["copyright_long"], auto_meta["notes"]
             )
         )
         self.conn.commit()
@@ -288,7 +340,9 @@ class BibleDB():
         else:
             raise Exception(f"returned_id expected to be int. Got {returned_id} ({type(returned_id)})")
 
+    @check_conn
     def __is_dublicate(self, meta: dict) -> bool:
+        return False
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT id

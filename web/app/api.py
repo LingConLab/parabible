@@ -1,7 +1,7 @@
 from flask import request
 
-from app import app, bible_db
-from .src import language_format_options, get_iso_lang_name, get_book_ids, get_book_name
+from . import app, bible_db
+from .src import language_format_options, get_iso_lang_name, get_book_ids, get_book_name, get_chapters_ids, get_verses_ids
 
 @app.route('/api/get/chapters')
 def api_get_chapters():
@@ -21,11 +21,11 @@ def api_get_chapters():
         return f"<h1>Error 400</h1> int 'book_id' argument is required", 400
     if not book_id in get_book_ids():
         return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {get_book_ids()}", 400
-    return_d['chapters'] = bible_db.get_chapters(book_id)
+    return_d['chapters'] = get_chapters_ids(book_id)
     return return_d
 
 @app.route('/api/get/verses')
-def api_get_verses():
+def api_get_verse_ids():
     """Get ids of verses in a specific chapter of a specific book
 
     Query Args:
@@ -44,11 +44,11 @@ def api_get_verses():
         return f"<h1>Error 400</h1> int arguments 'book_id' and 'chapter_id' are required", 400
     if not book_id in get_book_ids():
         return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {get_book_ids()}", 400
-    valid_chapters = bible_db.get_chapters(book_id)
-    if not chapter_id in valid_chapters:
+    valid_chapters = get_chapters_ids(book_id)
+    if not str(chapter_id) in valid_chapters:
         return f"<h1>Error 400</h1> 'chapter_id' ({chapter_id}) does not exist in this book (id={book_id} name=\"{get_book_name(book_id)}\"). Existing chapters: {valid_chapters}", 400
     
-    return_d['verses'] = bible_db.get_verses(book_id, chapter_id)
+    return_d['verses'] = get_verses_ids(book_id, chapter_id)
     return return_d
 
 @app.route('/api/get/langs')

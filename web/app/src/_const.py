@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 # Section to edit
 __data_dir_name = "data"
+__book_struct_file_name = "books_structure.json"
 __iso_index_file_name = "iso_639-3_index.json"
 __book_index_file_name = "book_id_index.json"
 language_format_options = {
@@ -22,15 +23,23 @@ language_format_options = {
 }
 
 # Funcs
-def check_dir(dir_path):
+def check_dir(dir_path, create_if_missing=False, is_critical=False):
     if not Path.exists(dir_path) or not Path.is_dir(dir_path):
-        logger.critical(f"{dir_path} dir is invalid or missing")
+        if is_critical:
+            logger.critical(f"{dir_path} dir is invalid or missing")
+            raise FileNotFoundError(f"{dir_path} dir is invalid or missing")
+        if create_if_missing:
+            Path.mkdir(dir_path)
+            logger.info(f"Created directory {dir_path}")
+    else:
+        logger.debug(f"Directory present {dir_path}")
         
 def check_file(file_path, is_critical: bool, do_create_on_missing: bool) -> bool:
     """If `is_critical` then critical error. Else info and create file"""
     if not Path.exists(file_path) or not Path.is_file(file_path):
         if is_critical:
             logger.critical(f"{file_path} file is invalid or missing.")
+            raise FileNotFoundError(f"{file_path} file is invalid or missing.")
             return False
         elif do_create_on_missing:
             with open(file_path, 'w'): pass
@@ -47,43 +56,57 @@ def check_file(file_path, is_critical: bool, do_create_on_missing: bool) -> bool
         return True
 
 # Processing section
-## Parent dir
+## Directories
 parent_dir = Path(__file__).parent
 data_dir = parent_dir.joinpath(Path(__data_dir_name))
-check_dir(data_dir)
+check_dir(data_dir, is_critical=True)
+
+def load_dict_from_file(file_path, parent_dir=data_dir, is_critical=False, do_create_on_missing=False, convert_keys_to_int=False, default="Unknown") -> dict:
+    file = parent_dir.joinpath(file_path)
+    file_present = check_file(file, is_critical, do_create_on_missing)
+    if file_present:
+        with open(file, 'r', encoding='utf-8') as f:
+            unprocessed = load(f)
+            result_dict = defaultdict(lambda: default)
+            result_dict.update(unprocessed)
+            if convert_keys_to_int:
+                result_dict = { int(k): v for k, v in result_dict.items() }
+            return result_dict
+    else:
+        return None
+
 ## Iso names
-__iso_index_file = data_dir.joinpath(__iso_index_file_name)
-__iso_index_present = check_file(__iso_index_file, is_critical=False, do_create_on_missing=False)
-if __iso_index_present:
-    with open(__iso_index_file, 'r', encoding='utf-8') as f:
-        __raw = load(f)
-        __iso_index_dict = defaultdict(lambda: "Unknown ISO 639-3 code")
-        __iso_index_dict.update(__raw)
+__iso_index_dict = load_dict_from_file(__iso_index_file_name)
 
 def get_iso_lang_name(iso_code: str) -> str:
-    if __iso_index_present:
+    if __iso_index_dict:
         return __iso_index_dict[iso_code]
     else:
         return iso_code
     
 ## Book names
-__book_index_file = data_dir.joinpath(__book_index_file_name)
-__book_index_present = check_file(__book_index_file, is_critical=False, do_create_on_missing=False)
-if __book_index_present:
-    with open(__book_index_file, 'r', encoding='utf-8') as f:
-        __raw = load(f)
-        __processed_dict = { int(k): v for k, v in __raw.items() }
-        __book_index_dict = defaultdict(lambda: "Unknown book id")
-        __book_index_dict.update(__processed_dict)
+__book_index_dict = load_dict_from_file(__book_index_file_name, convert_keys_to_int=True)
 
 def get_book_name(book_id: int) -> str:
-    if __iso_index_present:
+    if __book_index_dict:
         return __book_index_dict[book_id]
     else:
         return book_id
 
 def get_book_ids() -> list[int]:
-    if __iso_index_present:
+    if __book_index_dict:
         return list(__book_index_dict.keys())
     else:
         return []
+
+## Books structure
+book_struct_file = data_dir.joinpath(__book_struct_file_name)
+__book_struct_dict = load_dict_from_file(__book_struct_file_name)
+
+def get_chapters_ids(book_id: str | int) -> list:
+    if __book_struct_dict:
+        return list(__book_struct_dict[str(book_id)].keys())
+    
+def get_verses_ids(book_id: str | int, chapter_id: str | int) -> list:
+    if __book_struct_dict:
+        return __book_struct_dict[str(book_id)][str(chapter_id)]

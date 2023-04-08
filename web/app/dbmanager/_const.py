@@ -4,8 +4,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Section to edit
-__data_dir_name = "data"
-__schema_file_name = "schema.sql"
 NONE_LABEL = "Empty"
 
 # Funcs
@@ -28,8 +26,3 @@ def check_file(file_path, is_critical: bool):
 # Processing section
 ## Parent dir
 parent_dir = Path(__file__).parent
-data_dir = parent_dir.joinpath(Path(__data_dir_name))
-check_dir(data_dir)
-## Schema file
-schema_file = data_dir.joinpath(__schema_file_name)
-check_file(schema_file, is_critical=True)

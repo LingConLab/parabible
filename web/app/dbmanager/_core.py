@@ -168,7 +168,7 @@ class BibleDB():
         return result if not result else sorted( i[0] for i in result )
     
     @check_conn
-    def get_verses(self, book_id: int, chapter_id: int):
+    def get_verse_ids(self, book_id: int, chapter_id: int):
         cur = self.conn.cursor()
         cur.execute(
             """ SELECT verse_id FROM verses

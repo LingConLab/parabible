@@ -1,6 +1,7 @@
 tsa/
 .vscode/
 corpus-txt/
+books_structure.json
 
 *.zip
 *.pyc

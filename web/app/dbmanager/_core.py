@@ -254,7 +254,8 @@ class BibleDB():
         if not result:
             return result 
         result = map(lambda x: x[0], result)
-        result = map(lambda x: x if x else NONE_LABEL, result)
+        # result = map(lambda x: x if x else NONE_LABEL, result)
+        result = filter(lambda x: bool(x), result) # removing None value
         result = sorted(result)
         logger.debug(result)
         return result

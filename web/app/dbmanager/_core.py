@@ -253,8 +253,9 @@ class BibleDB():
         result = cur.fetchall()
         if not result:
             return result 
+        result = map(lambda x: x[0], result)
         result = map(lambda x: x if x else NONE_LABEL, result)
-        result = sorted( i[0] for i in result )
+        result = sorted(result)
         logger.debug(result)
         return result
 

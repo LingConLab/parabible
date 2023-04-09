@@ -95,8 +95,8 @@ def parse():
 def update_book_structure_dict():
     from tqdm import tqdm
     from json import dump
-    from web.app.dbmanager import BibleDB
-    from web.app.src import get_book_ids, book_struct_file
+    from web.app.src.dbmanager import BibleDB
+    from web.app.src.file_handling import file_data
     logger.info(f"Creating books structure index dicts...")
     try:
         local_bible_db = BibleDB()
@@ -107,11 +107,11 @@ def update_book_structure_dict():
         return
     
     result_dict = {}
-    for b_id in tqdm(get_book_ids(), desc="Books"):
+    for b_id in tqdm(file_data.get_book_ids(), desc="Books"):
         result_dict[b_id] = {}
         for ch_id in local_bible_db.get_chapters(b_id):
             result_dict[b_id][ch_id] = local_bible_db.get_verse_ids(b_id, ch_id)
-    with open(book_struct_file, 'w', encoding='utf-8') as f:
+    with open(file_data.book_struct_file, 'w', encoding='utf-8') as f:
         dump(result_dict, f, indent=4)
 
 if __name__ == "__main__":

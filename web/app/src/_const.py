@@ -4,6 +4,7 @@ from collections import defaultdict
 import logging
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # Section to edit
 __data_dir_name = "data"
@@ -40,7 +41,6 @@ def check_file(file_path, is_critical: bool, do_create_on_missing: bool) -> bool
         if is_critical:
             logger.critical(f"{file_path} file is invalid or missing.")
             raise FileNotFoundError(f"{file_path} file is invalid or missing.")
-            return False
         elif do_create_on_missing:
             with open(file_path, 'w'): pass
             if not Path.exists(file_path) or not Path.is_file(file_path):

@@ -10,18 +10,7 @@ logger.setLevel(logging.DEBUG)
 __data_dir_name = "data"
 __book_struct_file_name = "books_structure.json"
 __iso_index_file_name = "iso_639-3_index.json"
-__book_index_file_name = "book_id_index.json"
-language_format_options = {
-    'closest_iso_639_3': {
-        'frontend_name': 'Closest ISO 639-3'
-    },
-    'iso_15924': {
-        'frontend_name': 'ISO 15924'
-    }, 
-    'lang_name': {
-        'frontend_name': 'Literal language name'
-    }
-}
+__book_names_file_name = "book_names.json"
 
 # Funcs
 def check_dir(dir_path, create_if_missing=False, is_critical=False):
@@ -85,19 +74,25 @@ def get_iso_lang_name(iso_code: str) -> str:
         return iso_code
     
 ## Book names
-__book_index_dict = load_dict_from_file(__book_index_file_name, convert_keys_to_int=True)
+__book_names_dict = load_dict_from_file(__book_names_file_name, convert_keys_to_int=True)
 
-def get_book_name(book_id: int) -> str:
-    if __book_index_dict:
-        return __book_index_dict[book_id]
+def get_book_title(book_id: int) -> str:
+    if __book_names_dict:
+        return __book_names_dict[book_id]["title"]
     else:
         return book_id
 
 def get_book_ids() -> list[int]:
-    if __book_index_dict:
-        return list(__book_index_dict.keys())
+    if __book_names_dict:
+        return list(__book_names_dict.keys())
     else:
         return []
+
+def get_book_abbrivs() -> dict:
+    if __book_names_dict:
+        return { k: v["abbreviation"] for k, v in __book_names_dict.items() }
+    else:
+        return None
 
 ## Books structure
 book_struct_file = data_dir.joinpath(__book_struct_file_name)

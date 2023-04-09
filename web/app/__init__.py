@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
-from .dbmanager import BibleDB
+from .src.dbmanager import BibleDB
 
 app = Flask(__name__)
 bible_db = BibleDB()

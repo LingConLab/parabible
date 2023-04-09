@@ -2,7 +2,8 @@ from . import app, bible_db
 from flask import render_template
 import logging
 
-from .src import get_book_name, get_book_ids, language_format_options
+from .src.file_handling import file_data
+from . import const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -14,12 +15,12 @@ def index():
 
 @app.route('/search', methods=['get'])
 def library():
-    book_ids = get_book_ids()
-    book_ids_with_names = [ (x, get_book_name(x)) for x in book_ids ]
+    book_ids = file_data.get_book_ids()
+    book_ids_with_names = [ (x, file_data.get_book_title(x)) for x in book_ids ]
     return render_template(
         "search.html",
         book_ids = book_ids_with_names,
-        lang_formats = language_format_options.items(),
+        lang_formats = const.language_format_options.items(),
     )
 
 @app.route('/nothing', methods=['get', 'post'])

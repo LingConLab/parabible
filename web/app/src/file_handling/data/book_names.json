@@ -1,0 +1,346 @@
+{
+    "1": {
+        "title": "Genesis",
+        "abbreviation": "Gen."
+    },
+    "2": {
+        "title": "Exodus",
+        "abbreviation": "Ex."
+    },
+    "3": {
+        "title": "Leviticus",
+        "abbreviation": "Lev."
+    },
+    "4": {
+        "title": "Numbers",
+        "abbreviation": "Num."
+    },
+    "5": {
+        "title": "Deuteronomy",
+        "abbreviation": "Deut."
+    },
+    "6": {
+        "title": "Joshua",
+        "abbreviation": "Josh."
+    },
+    "7": {
+        "title": "Judges",
+        "abbreviation": "Judg."
+    },
+    "8": {
+        "title": "Ruth",
+        "abbreviation": "Ruth"
+    },
+    "9": {
+        "title": "1 Samuel",
+        "abbreviation": "1 Sam."
+    },
+    "10": {
+        "title": "2 Samuel",
+        "abbreviation": "2 Sam."
+    },
+    "11": {
+        "title": "1 Kings",
+        "abbreviation": "1 Kings"
+    },
+    "12": {
+        "title": "2 Kings",
+        "abbreviation": "2 Kings"
+    },
+    "13": {
+        "title": "1 Chronicles",
+        "abbreviation": "1 Chron."
+    },
+    "14": {
+        "title": "2 Chronicles",
+        "abbreviation": "2 Chron."
+    },
+    "15": {
+        "title": "Ezra",
+        "abbreviation": "Ezra"
+    },
+    "16": {
+        "title": "Nehemiah",
+        "abbreviation": "Neh."
+    },
+    "17": {
+        "title": "Esther",
+        "abbreviation": "Est."
+    },
+    "18": {
+        "title": "Job",
+        "abbreviation": "Job"
+    },
+    "19": {
+        "title": "Psalms",
+        "abbreviation": "Ps."
+    },
+    "20": {
+        "title": "Proverbs",
+        "abbreviation": "Prov."
+    },
+    "21": {
+        "title": "Ecclesiastes",
+        "abbreviation": "Eccles."
+    },
+    "22": {
+        "title": "Song of Solomon",
+        "abbreviation": "Song"
+    },
+    "23": {
+        "title": "Isaiah",
+        "abbreviation": "Isa."
+    },
+    "24": {
+        "title": "Jeremiah",
+        "abbreviation": "Jer."
+    },
+    "25": {
+        "title": "Lamentations",
+        "abbreviation": "Lam."
+    },
+    "26": {
+        "title": "Ezekiel",
+        "abbreviation": "Ezek."
+    },
+    "27": {
+        "title": "Daniel",
+        "abbreviation": "Dan."
+    },
+    "28": {
+        "title": "Hosea",
+        "abbreviation": "Hos."
+    },
+    "29": {
+        "title": "Joel",
+        "abbreviation": "Joel"
+    },
+    "30": {
+        "title": "Amos",
+        "abbreviation": "Amos"
+    },
+    "31": {
+        "title": "Obadiah",
+        "abbreviation": "Obad."
+    },
+    "32": {
+        "title": "Jonah",
+        "abbreviation": "Jonah"
+    },
+    "33": {
+        "title": "Micah",
+        "abbreviation": "Mic."
+    },
+    "34": {
+        "title": "Nahum",
+        "abbreviation": "Nah."
+    },
+    "35": {
+        "title": "Habakkuk",
+        "abbreviation": "Hab."
+    },
+    "36": {
+        "title": "Zephaniah",
+        "abbreviation": "Zeph."
+    },
+    "37": {
+        "title": "Haggai",
+        "abbreviation": "Hag."
+    },
+    "38": {
+        "title": "Zechariah",
+        "abbreviation": "Zech."
+    },
+    "39": {
+        "title": "Malachi",
+        "abbreviation": "Mal."
+    },
+    "40": {
+        "title": "Matthew",
+        "abbreviation": "Matt."
+    },
+    "41": {
+        "title": "Mark",
+        "abbreviation": "Mark"
+    },
+    "42": {
+        "title": "Luke",
+        "abbreviation": "Luke"
+    },
+    "43": {
+        "title": "John",
+        "abbreviation": "John"
+    },
+    "44": {
+        "title": "Acts",
+        "abbreviation": "Acts"
+    },
+    "45": {
+        "title": "Romans",
+        "abbreviation": "Rom."
+    },
+    "46": {
+        "title": "1 Corinthians",
+        "abbreviation": "1 Cor."
+    },
+    "47": {
+        "title": "2 Corinthians",
+        "abbreviation": "2 Cor."
+    },
+    "48": {
+        "title": "Galatians",
+        "abbreviation": "Gal."
+    },
+    "49": {
+        "title": "Ephesians",
+        "abbreviation": "Eph."
+    },
+    "50": {
+        "title": "Philippians",
+        "abbreviation": "Phil."
+    },
+    "51": {
+        "title": "Colossians",
+        "abbreviation": "Col."
+    },
+    "52": {
+        "title": "1 Thessalonians",
+        "abbreviation": "1 Thess."
+    },
+    "53": {
+        "title": "2 Thessalonians",
+        "abbreviation": "2 Thess."
+    },
+    "54": {
+        "title": "1 Timothy",
+        "abbreviation": "1 Tim."
+    },
+    "55": {
+        "title": "2 Timothy",
+        "abbreviation": "2 Tim."
+    },
+    "56": {
+        "title": "Titus",
+        "abbreviation": "Titus"
+    },
+    "57": {
+        "title": "Philemon",
+        "abbreviation": "Philem."
+    },
+    "58": {
+        "title": "Hebrews",
+        "abbreviation": "Heb."
+    },
+    "59": {
+        "title": "James",
+        "abbreviation": "James"
+    },
+    "60": {
+        "title": "1 Peter",
+        "abbreviation": "1 Pet."
+    },
+    "61": {
+        "title": "2 Peter",
+        "abbreviation": "2 Pet."
+    },
+    "62": {
+        "title": "1 John",
+        "abbreviation": "1 John"
+    },
+    "63": {
+        "title": "2 John",
+        "abbreviation": "2 John"
+    },
+    "64": {
+        "title": "3 John",
+        "abbreviation": "3 John"
+    },
+    "65": {
+        "title": "Jude",
+        "abbreviation": "Jude"
+    },
+    "66": {
+        "title": "Revelation",
+        "abbreviation": "Rev."
+    },
+    "67": {
+        "title": "Tobit",
+        "abbreviation": "Tobit"
+    },
+    "68": {
+        "title": "Judith",
+        "abbreviation": "Judith"
+    },
+    "69": {
+        "title": "Greek version of Esther",
+        "abbreviation": "Greek version of Esther"
+    },
+    "70": {
+        "title": "Wisdom of Solomon",
+        "abbreviation": "Wisdom of Solomon"
+    },
+    "71": {
+        "title": "Ecclesiasticus 'Sirach'",
+        "abbreviation": "Ecclesiasticus 'Sirach'"
+    },
+    "72": {
+        "title": "Baruch",
+        "abbreviation": "Baruch"
+    },
+    "73": {
+        "title": "Epistle of Jeremiah",
+        "abbreviation": "Epistle of Jeremiah"
+    },
+    "74": {
+        "title": "Prayer of Azariah",
+        "abbreviation": "Prayer of Azariah"
+    },
+    "75": {
+        "title": "Susanna",
+        "abbreviation": "Susanna"
+    },
+    "76": {
+        "title": "Bel and the Dragon",
+        "abbreviation": "Bel and the Dragon"
+    },
+    "77": {
+        "title": "1 Maccabees",
+        "abbreviation": "1 Macc."
+    },
+    "78": {
+        "title": "2 Maccabees",
+        "abbreviation": "2 Macc."
+    },
+    "79": {
+        "title": "3 Maccabees",
+        "abbreviation": "3 Macc."
+    },
+    "80": {
+        "title": "4 Maccabees",
+        "abbreviation": "4 Macc."
+    },
+    "81": {
+        "title": "1 Esdras",
+        "abbreviation": "1 Esdras"
+    },
+    "82": {
+        "title": "2 Esdras",
+        "abbreviation": "2 Esdras"
+    },
+    "83": {
+        "title": "Prayer of Manasseh",
+        "abbreviation": "Prayer of Manasseh"
+    },
+    "84": {
+        "title": "Psalm 151",
+        "abbreviation": "Psalm 151"
+    },
+    "85": {
+        "title": "Psalm of Solomon",
+        "abbreviation": "Psalm of Solomon"
+    },
+    "86": {
+        "title": "Odes",
+        "abbreviation": "Odes"
+    }
+}

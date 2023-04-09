@@ -1,7 +1,18 @@
 from flask import request
 
 from . import app, bible_db
-from .src import language_format_options, get_iso_lang_name, get_book_ids, get_book_name, get_chapters_ids, get_verses_ids
+from .src.file_handling import file_data
+from . import const
+
+@app.route('/api/get/book_title_abbrs')
+def api_get_book_abbrs():
+    """Get book title abbriveations
+
+    Returns: json object
+        dict: { int: str }
+    """
+    return_d = file_data.get_book_abbrivs()
+    return return_d
 
 @app.route('/api/get/chapters')
 def api_get_chapters():
@@ -19,9 +30,9 @@ def api_get_chapters():
     book_id = request.args.get('book_id', default=None, type=int)
     if not book_id:
         return f"<h1>Error 400</h1> int 'book_id' argument is required", 400
-    if not book_id in get_book_ids():
-        return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {get_book_ids()}", 400
-    return_d['chapters'] = get_chapters_ids(book_id)
+    if not book_id in file_data.get_book_ids():
+        return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {file_data.get_book_ids()}", 400
+    return_d['chapters'] = file_data.get_chapters_ids(book_id)
     return return_d
 
 @app.route('/api/get/verses')
@@ -42,13 +53,13 @@ def api_get_verse_ids():
     chapter_id = request.args.get('chapter_id', default=None, type=int)
     if not book_id or not chapter_id:
         return f"<h1>Error 400</h1> int arguments 'book_id' and 'chapter_id' are required", 400
-    if not book_id in get_book_ids():
-        return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {get_book_ids()}", 400
-    valid_chapters = get_chapters_ids(book_id)
+    if not book_id in file_data.get_book_ids():
+        return f"<h1>Error 400</h1> 'book_id' value ({book_id}) is invalid. Valid ids: {file_data.get_book_ids()}", 400
+    valid_chapters = file_data.get_chapters_ids(book_id)
     if not str(chapter_id) in valid_chapters:
-        return f"<h1>Error 400</h1> 'chapter_id' ({chapter_id}) does not exist in this book (id={book_id} name=\"{get_book_name(book_id)}\"). Existing chapters: {valid_chapters}", 400
+        return f"<h1>Error 400</h1> 'chapter_id' ({chapter_id}) does not exist in this book (id={book_id} name=\"{file_data.get_book_title(book_id)}\"). Existing chapters: {valid_chapters}", 400
     
-    return_d['verses'] = get_verses_ids(book_id, chapter_id)
+    return_d['verses'] = file_data.get_verses_ids(book_id, chapter_id)
     return return_d
 
 @app.route('/api/get/langs')
@@ -75,14 +86,14 @@ def api_get_langs():
     The format of the "val" is stored in "val_format".
     """
     return_d = {}
-    format = request.args.get('format', default=list(language_format_options.keys())[0], type=str)
-    if not format in language_format_options:
-        format = list(language_format_options.keys())[0]
+    format = request.args.get('format', default=list(const.language_format_options.keys())[0], type=str)
+    if not format in const.language_format_options:
+        format = list(const.language_format_options.keys())[0]
           
     if format == 'lang_name':
         lang_list = bible_db.get_langs_list('closest_iso_639_3')
         return_d['val_format'] = 'closest_iso_639_3'
-        return_d['lang_list'] = [ { 'label': get_iso_lang_name(x), 'val': x } for x in lang_list ]
+        return_d['lang_list'] = [ { 'label': file_data.get_iso_lang_name(x), 'val': x } for x in lang_list ]
         return_d['lang_list'].sort(key=lambda x: x['label'])
     else:
         # just raw format as it is
@@ -121,8 +132,8 @@ def api_get_translations():
     lang = request.args.get('lang', default=None, type=str)
     if not lang or not format:
         return f"<h1>Error 400</h1> 'lang' and 'format' arguments are both required", 400
-    if not format in language_format_options:
-        format = list(language_format_options.keys())[0]
+    if not format in const.language_format_options:
+        format = list(const.language_format_options.keys())[0]
         
     return_d['translations_list'] = bible_db.get_text_list(format, lang)
 

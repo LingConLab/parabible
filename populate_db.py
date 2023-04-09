@@ -69,8 +69,8 @@ def unzip(file_name):
 
 def parse():
     """Connects to the DB and parses extracted content there."""
-    from web.app.dbmanager import BibleDB
-    from web.app.dbmanager.parser import parser as db_parser
+    from web.app.src.dbmanager import BibleDB
+    from web.app.src.dbmanager.parser import parser as db_parser
 
     logger.info(f"Parsing .txt files into DB...")
 

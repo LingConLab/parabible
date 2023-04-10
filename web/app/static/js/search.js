@@ -196,8 +196,7 @@ function updateRequestTextBox() {
         versesString += `${addedVerses[i]["book_id"]}.${addedVerses[i]["chapter_id"]}.${addedVerses[i]["verse_id"]} `;
     }
     for (var i = 0; i < addedTranslations.length; i++) {
-        // TODO
-        translationsString += `${addedTranslations[i]["placeholder"]}_${i} `;
+        translationsString += `${addedTranslations[i]["id"]} `;
     }
     versesString = versesString.trim();
     translationsString = translationsString.trim();
@@ -229,8 +228,18 @@ function addVerse() {
 
 function addTranslation() {
     var objToAdd = {
-        "placeholder": "placeholder"
+        "id": translationSelect[translationSelect.selectedIndex].value
     };
+    // going through all the items to check the dubs
+    var dublicateIndex = -1;
+    for (var i = 0; i < addedTranslations.length; i++) {
+        if (JSON.stringify(addedTranslations[i]) === JSON.stringify(objToAdd)) {
+            dublicateIndex = i;
+            break;
+        }
+    }
+    // remove prev dublicate if met
+    if (dublicateIndex >= 0) addedTranslations.splice(dublicateIndex, 1);
     addedTranslations.push(objToAdd);
     updateRequestTextBox();
 }

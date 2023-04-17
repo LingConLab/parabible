@@ -184,8 +184,6 @@ function updateLangSelect(langFormat) {
 }
 
 function loadBookAbbrivs() {
-    selectLoadingState(langSelect);
-
     getJson(`/api/get/book_title_abbrs`)
     .then((json) => {
         bookAbbriviations = json;

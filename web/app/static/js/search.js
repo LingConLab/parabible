@@ -204,7 +204,7 @@ function updateRequestTextBox() {
     var delimeter = ":";
     for (var i = 0; i < addedVerses.length; i++) {
         bookAbbriv = bookAbbriviations[addedVerses[i]["book_id"]];
-        versesString += `${bookAbbriv}${delimeter}${addedVerses[i]["chapter_id"]}${delimeter}${addedVerses[i]["verse_id"]} `;
+        versesString += `"${bookAbbriv}"${delimeter}${addedVerses[i]["chapter_id"]}${delimeter}${addedVerses[i]["verse_id"]} `;
     }
     for (var i = 0; i < addedTranslations.length; i++) {
         translationsString += `${addedTranslations[i]["id"]} `;

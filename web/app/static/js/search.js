@@ -2,8 +2,8 @@
 // --- Initialisation --- //
 ////////////////////////////
 
-//const rootEndPoint = "/parabible";
-const rootEndPoint = "";
+const rootEndPoint = "/parabible";
+//const rootEndPoint = "";
 const host = window.location.protocol + "//" + window.location.host + rootEndPoint;
 
 const bookSelect = document.querySelector('#book_select');
@@ -185,7 +185,7 @@ function updateLangSelect(langFormat) {
 
 function loadBookAbbrivs() {
     selectLoadingState(langSelect);
-    
+
     getJson(`/api/get/book_title_abbrs`)
     .then((json) => {
         bookAbbriviations = json;

@@ -81,6 +81,12 @@ def get_book_title(book_id: int) -> str:
         return __book_names_dict[book_id]["title"]
     else:
         return book_id
+    
+def get_book_short_title(book_id: int) -> str:
+    if __book_names_dict:
+        return __book_names_dict[book_id]["abbreviation"]
+    else:
+        return book_id
 
 def get_book_ids() -> list[int]:
     if __book_names_dict:

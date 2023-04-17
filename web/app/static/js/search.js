@@ -2,8 +2,8 @@
 // --- Initialisation --- //
 ////////////////////////////
 
-const rootEndPoint = "/parabible";
-//const rootEndPoint = "";
+//const rootEndPoint = "/parabible";
+const rootEndPoint = "";
 const host = window.location.protocol + "//" + window.location.host + rootEndPoint;
 
 const bookSelect = document.querySelector('#book_select');
@@ -19,6 +19,9 @@ const requestTextBox = document.querySelector('#request_text_box')
 var langFormatValue = null;
 var addedVerses = [];
 var addedTranslations = [];
+
+var bookAbbriviations = null;
+loadBookAbbrivs();
 
 function logRegular(prefx, msg) {
     console.log(`[${prefx}] ${msg}`);
@@ -79,21 +82,33 @@ langSelect.addEventListener('change', () => {
     updateTranslationSelect(langSelect.value);
 });
 
-///////////////////////////////////
+///////////////////////////////////////
 // --------    API calls    -------- //
-///////////////////////////////////
+///////////////////////////////////////
 
-function updateVerseSelect(book_id, chapter_id) {
-    const url = host + `/api/get/verses?book_id=${book_id}&chapter_id=${chapter_id}`;
-    selectLoadingState(verseSelect);
+function getJson(endpoint) {
+    const url = host + endpoint;
     logRequest(url);
-    fetch(url)
+    return fetch(url)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error: ${response.status}`);
         }
         return response.json();
     })
+    .then((data) => {
+        return data;
+    })
+    .catch((error) => {
+        console.log(`Could not fetch data: ${error}`);
+        return null;
+    });
+}
+
+function updateVerseSelect(book_id, chapter_id) {
+    selectLoadingState(verseSelect);
+
+    getJson(`/api/get/verses?book_id=${book_id}&chapter_id=${chapter_id}`)
     .then((json) => {
         wipeOptions(verseSelect);
         for (let i = 0; i < json['verses'].length; i++) {
@@ -104,20 +119,14 @@ function updateVerseSelect(book_id, chapter_id) {
         console.log(`Could not fetch langs: ${error}`);
         errorSelect(verseSelect);
     });
+
     verseSelect.removeAttribute('disabled');
 }
 
 function updateChapterSelect(book_id) {
-    const url = host + `/api/get/chapters?book_id=${book_id}`;
     selectLoadingState(chapterSelect);
-    logRequest(url);
-    fetch(url)
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        return response.json();
-    })
+
+    getJson(`/api/get/chapters?book_id=${book_id}`)
     .then((json) => {
         wipeOptions(chapterSelect);
         for (let i = 0; i < json['chapters'].length; i++) {
@@ -128,20 +137,14 @@ function updateChapterSelect(book_id) {
         console.log(`Could not fetch langs: ${error}`);
         errorSelect(chapterSelect);
     });
+
     chapterSelect.removeAttribute('disabled');
 }
 
 function updateTranslationSelect(lang) {
-    const url = host + `/api/get/translations?format=${langFormatValue}&lang=${lang}`;
     selectLoadingState(translationSelect);
-    logRequest(url);
-    fetch(url)
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        return response.json();
-    })
+    
+    getJson(`/api/get/translations?format=${langFormatValue}&lang=${lang}`)
     .then((json) => {
         wipeOptions(translationSelect);
         for (let i = 0; i < json['translations_list'].length; i++) {
@@ -157,20 +160,14 @@ function updateTranslationSelect(lang) {
         console.log(`Could not fetch langs: ${error}`);
         errorSelect(langSelect);
     });
+
     translationSelect.removeAttribute('disabled');
 }
 
 function updateLangSelect(langFormat) {
-    const url = host + `/api/get/langs?format=${langFormat}`;
     selectLoadingState(langSelect);
-    logRequest(url);
-    fetch(url)
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        return response.json();
-    })
+    
+    getJson(`/api/get/langs?format=${langFormat}`)
     .then((json) => {
         langFormatValue = json['val_format'];
         wipeOptions(langSelect);
@@ -182,7 +179,21 @@ function updateLangSelect(langFormat) {
         console.log(`Could not fetch langs: ${error}`);
         errorSelect(langSelect);
     });
+
     langSelect.removeAttribute('disabled');
+}
+
+function loadBookAbbrivs() {
+    selectLoadingState(langSelect);
+    
+    getJson(`/api/get/book_title_abbrs`)
+    .then((json) => {
+        bookAbbriviations = json;
+    })
+    .catch((error) => {
+        console.log(`Could not fetch langs: ${error}`);
+        bookAbbriviations = null;
+    });
 }
 
 /////////////////////////////////////////
@@ -192,8 +203,10 @@ function updateLangSelect(langFormat) {
 function updateRequestTextBox() {
     var versesString = "";
     var translationsString = "";
+    var delimeter = ":";
     for (var i = 0; i < addedVerses.length; i++) {
-        versesString += `${addedVerses[i]["book_id"]}.${addedVerses[i]["chapter_id"]}.${addedVerses[i]["verse_id"]} `;
+        bookAbbriv = bookAbbriviations[addedVerses[i]["book_id"]];
+        versesString += `${bookAbbriv}${delimeter}${addedVerses[i]["chapter_id"]}${delimeter}${addedVerses[i]["verse_id"]} `;
     }
     for (var i = 0; i < addedTranslations.length; i++) {
         translationsString += `${addedTranslations[i]["id"]} `;

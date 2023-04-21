@@ -1,62 +1,40 @@
-<html>
-{% extends 'bootstrap/base.html' %}
-<head>
-    <title>Parabible</title>
-    <link rel="stylesheet" href="../static/style.css" />
-</head>
-
-<body>
-    {% block navbar %}
-    <nav class="navbar navbar-default">
-        <div class="container">
-        <a class="navbar-brand" style="height: 10px; font-size: xx-large; font-family: EBGaramond-Regular">ParaBible: parallel biblical corpora</a>
-        <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
-            <ul class="nav navbar-nav btn-group">
-                <a href="home"><button class="button">About us</button></a>
-                <a href="search"><button class="button">Search</button></a>
-                <button class="button">Log in</button>
-            </ul>            
+{% extends 'base.html' %}
+{% block main %}
+<div class="container pt-5">
+    <div class="row">
+        <div class="col-md-2">
+            <ul  id="main_list" class="list-group">
+                <a href="#about" class="list-group-item active">About ParaBible</a>
+                <a href="#mission" class="list-group-item">Our Mission</a>
+                <a href="#usage" class="list-group-item">How to use</a>
+            </ul>
         </div>
-    </div>
-    </nav>
-    {% endblock %}
+        <div data-spy="scroll" data-target="#main_list" class="col-md-6">
+            <h1 id="about">About us</h1>
+            <p>A parallel corpus of Bible texts is a collection of different translations or versions of the Bible that have been aligned at the sentence or verse level. This type of corpus allows for easy comparison and analysis of the different translations, as well as the identification of similarities and differences between them.
 
-    {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-2">
-                <ul  id="main_list" class="list-group">
-                    <a href="#about" class="list-group-item active">About ParaBible</a>
-                    <a href="#mission" class="list-group-item">Our Mission</a>
-                    <a href="#usage" class="list-group-item">How to use</a>
-                </ul>
-            </div>
-            <div data-spy="scroll" data-target="#main_list" class="col-md-6">
-                <h1 id="about">About us</h1>
-                <p>A parallel corpus of Bible texts is a collection of different translations or versions of the Bible that have been aligned at the sentence or verse level. This type of corpus allows for easy comparison and analysis of the different translations, as well as the identification of similarities and differences between them.
+                One of the main uses of a parallel corpus of Bible texts is in the field of Bible translation, where it can be used to help translators ensure that their work is accurate and faithful to the original texts. By comparing different translations of the same passage, translators can gain a deeper understanding of the meaning and context of the text, and make more informed decisions about how to render it in their own language.
+                
+                In addition to being used by Bible translators, parallel corpora of Bible texts are also used by scholars, researchers, and students for a variety of other purposes, such as studying the history of translation, analyzing language change over time, or exploring the cultural and religious contexts of the texts.
+                
+                Creating a parallel corpus of Bible texts is a complex and time-consuming process that requires a high level of expertise in both text alignment and Bible scholarship. However, there are some pre-existing parallel corpus of Bible texts that can be used for research and study purposes.
+                
+                Overall, a parallel corpus of Bible texts is a valuable resource for anyone interested in studying the Bible and its translations. It can provide important insights into the meaning and context of the texts and help to deepen our understanding of the Word of God.</p>
+            <br>
+            <h1 id="mission">Our Mission</h1>
+            <p>A parallel corpus of Bible texts is a collection of different translations or versions of the Bible that have been aligned at the sentence or verse level. This type of corpus allows for easy comparison and analysis of the different translations, as well as the identification of similarities and differences between them.
 
-                    One of the main uses of a parallel corpus of Bible texts is in the field of Bible translation, where it can be used to help translators ensure that their work is accurate and faithful to the original texts. By comparing different translations of the same passage, translators can gain a deeper understanding of the meaning and context of the text, and make more informed decisions about how to render it in their own language.
-                    
-                    In addition to being used by Bible translators, parallel corpora of Bible texts are also used by scholars, researchers, and students for a variety of other purposes, such as studying the history of translation, analyzing language change over time, or exploring the cultural and religious contexts of the texts.
-                    
-                    Creating a parallel corpus of Bible texts is a complex and time-consuming process that requires a high level of expertise in both text alignment and Bible scholarship. However, there are some pre-existing parallel corpus of Bible texts that can be used for research and study purposes.
-                    
-                    Overall, a parallel corpus of Bible texts is a valuable resource for anyone interested in studying the Bible and its translations. It can provide important insights into the meaning and context of the texts and help to deepen our understanding of the Word of God.</p>
-                <br>
-                <h1 id="mission">Our Mission</h1>
-                <p>A parallel corpus of Bible texts is a collection of different translations or versions of the Bible that have been aligned at the sentence or verse level. This type of corpus allows for easy comparison and analysis of the different translations, as well as the identification of similarities and differences between them.
-
-                    One of the main uses of a parallel corpus of Bible texts is in the field of Bible translation, where it can be used to help translators ensure that their work is accurate and faithful to the original texts. By comparing different translations of the same passage, translators can gain a deeper understanding of the meaning and context of the text, and make more informed decisions about how to render it in their own language.
-                    
-                    In addition to being used by Bible translators, parallel corpora of Bible texts are also used by scholars, researchers, and students for a variety of other purposes, such as studying the history of translation, analyzing language change over time, or exploring the cultural and religious contexts of the texts.
-                    
-                    Creating a parallel corpus of Bible texts is a complex and time-consuming process that requires a high level of expertise in both text alignment and Bible scholarship. However, there are some pre-existing parallel corpus of Bible texts that can be used for research and study purposes.
-                    
-                    Overall, a parallel corpus of Bible texts is a valuable resource for anyone interested in studying the Bible and its translations. It can provide important insights into the meaning and context of the texts and help to deepen our understanding of the Word of God.</p>
-                <br>
-                <h1 id="usage">How to use?</h1>
-                <p>
-                    Using a parallel corpus of Bible texts can be done in different ways depending on the specific corpus you have access to and the tools you are using. Here is a general guide on how to use a parallel corpus of Bible texts:
+                One of the main uses of a parallel corpus of Bible texts is in the field of Bible translation, where it can be used to help translators ensure that their work is accurate and faithful to the original texts. By comparing different translations of the same passage, translators can gain a deeper understanding of the meaning and context of the text, and make more informed decisions about how to render it in their own language.
+                
+                In addition to being used by Bible translators, parallel corpora of Bible texts are also used by scholars, researchers, and students for a variety of other purposes, such as studying the history of translation, analyzing language change over time, or exploring the cultural and religious contexts of the texts.
+                
+                Creating a parallel corpus of Bible texts is a complex and time-consuming process that requires a high level of expertise in both text alignment and Bible scholarship. However, there are some pre-existing parallel corpus of Bible texts that can be used for research and study purposes.
+                
+                Overall, a parallel corpus of Bible texts is a valuable resource for anyone interested in studying the Bible and its translations. It can provide important insights into the meaning and context of the texts and help to deepen our understanding of the Word of God.</p>
+            <br>
+            <h1 id="usage">How to use?</h1>
+            <p>
+                Using a parallel corpus of Bible texts can be done in different ways depending on the specific corpus you have access to and the tools you are using. Here is a general guide on how to use a parallel corpus of Bible texts:
 
 Obtain a parallel corpus of Bible texts: There are a number of pre-existing parallel corpora of Bible texts available online, such as the English-Greek Parallel New Testament or the Bible Study Tools Parallel Bible. You can also create your own parallel corpus by aligning different Bible translations using text alignment tools.
 
@@ -78,11 +56,8 @@ Please note that this guide is a general one, and the specific steps for using a
 
 
 
-                </p>
-                </div>
-        </div>
+            </p>
+            </div>
     </div>
-    {% endblock %}
-</body>
-
-</html>
+</div>
+{% endblock %}

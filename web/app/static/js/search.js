@@ -248,3 +248,7 @@ function addTranslation() {
     addedTranslations.push(objToAdd);
     updateRequestTextBox();
 }
+
+function addTag(label, parent) {
+    return;
+}

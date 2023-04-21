@@ -1,83 +1,79 @@
-{% extends 'bootstrap/base.html' %}
-{% block styles %}
-<!-- <link href="static/css/library.css" rel="stylesheet"> -->
-<!-- Bootstrap -->
-<link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
-{% endblock %}
-{% block navbar %}
-<nav class="navbar navbar-default">
-  <div class="container">
-    <a class="navbar-brand" style="height: 10px; font-size: xx-large;">Parabible</a>
-    <div class="navbar-collapse collapse navbar-right" style="height: 0.8px; margin-top: 10px;">
-      <ul class="nav navbar-nav btn-group">
-        <a href="home"><button class="button">About us</button></a>
-        <a href="library"><button class="button">Search</button></a>
-        <button class="button">Log in</button>
-      </ul>
-    </div>
-  </div>
-</nav>
-{% endblock %}
-{% block content %}
-<div class="row d-flex justify-content-center">
-  <div class="col-sm-3 mx-left"></div>
-  <div class="col-sm-5 mx-center">
-    <h3>Choose verses</h3>
-    <div class="smallborder selection_box">
-      <div class="selection_item">
-        <label for="book">Book id:</label>
-        <select class="select_cls" name="book" id="book_select">
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mx-auto pt-5">
+  <div class="container row align-items-start">
+    <div class="container col">
+      <h4>Choose verses</h4>
+      <div class="container">
+        <label for="book">Book:</label>
+        <select class="form-select" name="book" id="book_select">
           <option disabled selected value> -- select an option -- </option>
           {% for b_id in book_ids %}
             <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="selection_item">
-        <label for="chapter">Chapter id:</label>
-        <select class="select_cls" name="chapter" id="chapter_select" disabled="disabled">
+      <div class="container">
+        <label for="chapter">Chapter:</label>
+        <select class="form-select" name="chapter" id="chapter_select" disabled="disabled">
           <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
-      <div class="selection_item">
-        <label for="varse">Verse id:</label>
-        <select class="select_cls" name="verse" id="verse_select" disabled="disabled">
+      <div class="container">
+        <label for="varse">Verse:</label>
+        <select class="form-select" name="verse" id="verse_select" disabled="disabled">
           <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
-      <button onclick="addVerse();">Add verse</button>
+      <div class="container py-1">
+        <button onclick="addVerse();" class="btn btn-primary">Add verse</button>
+      </div>
+      <div id="verse_tag_box" class="container py-2">
+        <div class="d-inline bg-light border p-1 mx-1 rounded">
+          <p class="d-inline fw-light">John. 12:9</p>
+          <button class="d-inline btn btn-sm btn-outline-danger py-0 px-1">✕</button>
+        </div>
+        <div class="d-inline bg-light border p-1 mx-1 rounded">
+          <p class="d-inline fw-light">1 Chron. 5:8</p>
+          <button class="d-inline btn btn-sm btn-outline-danger py-0 px-1">✕</button>
+        </div>
+      </div>
     </div>
-    <h3>Choose translations</h3> 
-    <div class="smallborder selection_box">
-      <div class="selection_item">
+    <div class="container col">
+      <h4>Choose translations</h4> 
+      <div class="container">
         <label for="book">Language format:</label>
-        <select class="select_cls" name="lang_format" id="lang_format_select">
+        <select class="form-select" name="lang_format" id="lang_format_select">
           <option disabled selected value> -- select an option -- </option>
           {% for format in lang_formats %}
             <option value="{{ format[0] }}">{{ format[1]['frontend_name'] }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="selection_item">
+      <div class="container">
         <label for="book">Language:</label>
-        <select class="select_cls" name="lang" id="lang_select" disabled="disabled">
+        <select class="form-select" name="lang" id="lang_select" disabled="disabled">
           <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
-      <div class="selection_item">
+      <div class="container">
         <label for="book">Translation:</label>
-        <select class="select_cls" name="translation" id="translation_select" disabled="disabled">
+        <select class="form-select" name="translation" id="translation_select" disabled="disabled">
           <option disabled selected value> -- select an option -- </option>
         </select>
       </div>
-      <button onclick="addTranslation();">Add translation</button>
+      <div class="container py-1">
+        <button onclick="addTranslation();" class="btn btn-primary">Add translation</button>
+      </div>
     </div>
-    <form method="post" action="nothing">
-      <textarea class="smallborder" name="verse_ids_input" rows="3" cols="60" id="request_text_box"></textarea>
-      <input type="submit">
-    </form>
+    <div class="container col">
+      <h4>Raw request</h4> 
+      <form method="post" action="nothing">
+        <textarea class="smallborder" name="verse_ids_input" rows="3" cols="20" id="request_text_box"></textarea>
+        <input type="submit">
+      </form>
+    </div>
   </div>
-  <div class="col-sm-4 mx-right"></div>
 </div>
 <script src="static/js/search.js"></script>
 {% endblock %}

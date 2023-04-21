@@ -214,7 +214,7 @@ function updateRequestTextBox() {
 
     var result = `${versesString}\n---\n${translationsString}`;
     requestTextBox.value = result;
-    logRegular('TextBox', result);
+    logRegular('updateRequestTextBox', result);
 }
 
 function addVerse() {
@@ -224,15 +224,12 @@ function addVerse() {
         "verse_id": verse_select[verse_select.selectedIndex].value
     };
     // going through all the items to check the dubs
-    var dublicateIndex = -1;
     for (var i = 0; i < addedVerses.length; i++) {
         if (JSON.stringify(addedVerses[i]) === JSON.stringify(objToAdd)) {
-            dublicateIndex = i;
-            break;
+            logRegular('addVerse', 'Dublicate met');
+            return;
         }
     }
-    // remove prev dublicate if met
-    if (dublicateIndex >= 0) addedVerses.splice(dublicateIndex, 1);
     addedVerses.push(objToAdd);
     updateRequestTextBox();
 }
@@ -242,15 +239,12 @@ function addTranslation() {
         "id": translationSelect[translationSelect.selectedIndex].value
     };
     // going through all the items to check the dubs
-    var dublicateIndex = -1;
-    for (var i = 0; i < addedTranslations.length; i++) {
+    for (var i = 0; i < addedTranslations.length; i++)
         if (JSON.stringify(addedTranslations[i]) === JSON.stringify(objToAdd)) {
-            dublicateIndex = i;
-            break;
+            // we met a dublicate => skip it
+            logRegular('addTranslation', 'Dublicate met');
+            return;
         }
-    }
-    // remove prev dublicate if met
-    if (dublicateIndex >= 0) addedTranslations.splice(dublicateIndex, 1);
     addedTranslations.push(objToAdd);
     updateRequestTextBox();
 }

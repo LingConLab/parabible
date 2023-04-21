@@ -42,6 +42,12 @@ def check_file(file_path, is_critical: bool, do_create_on_missing: bool) -> bool
             logger.warn(f"{file_path} file is invalid or missing.")
             return False
     else:
+        logger.debug("File present '{}'\nis_critical : {}\ncreate_on_missing : {}\npath : {}".format(
+            file_path.name,
+            is_critical,
+            do_create_on_missing,
+            file_path
+        ))
         return True
 
 # Processing section

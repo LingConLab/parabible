@@ -9,12 +9,16 @@ const host = window.location.protocol + "//" + window.location.host + rootEndPoi
 const bookSelect = document.querySelector('#book_select');
 const chapterSelect = document.querySelector('#chapter_select');
 const verseSelect = document.querySelector('#verse_select');
+const verseTagBox = document.querySelector('#verse_tag_box');
 
 const langFormatSelect = document.querySelector('#lang_format_select');
 const langSelect = document.querySelector('#lang_select');
 const translationSelect = document.querySelector('#translation_select');
+const translationTagBox = document.querySelector('#verse_translations_box');
 
-const requestTextBox = document.querySelector('#request_text_box')
+const addVerseButton = document.querySelector('#add_verse_btn');
+const addTranslationButton = document.querySelector('#add_translation_btn');
+const requestTextBox = document.querySelector('#request_text_box');
 
 var langFormatValue = null;
 var addedVerses = [];
@@ -45,41 +49,47 @@ function addOption(parent, label, value, disable_option=false, preselect_option=
     parent.appendChild(node);
 }
 
-function wipeAllOptions(parent) {
+function wipeAllChildren(parent) {
     while (parent.hasChildNodes()) {
         parent.removeChild(parent.lastChild);
     }
 }
 
 function wipeOptions(parent, disable_menu=false) {
-    wipeAllOptions(parent);
+    wipeAllChildren(parent);
     addOption(parent, " -- select an option -- ", "", true, true);
     if (disable_menu) parent.setAttribute('disabled', 'disabled');
 }
 
 function selectLoadingState(parent) {
-    wipeAllOptions(parent);
+    wipeAllChildren(parent);
     addOption(parent, " -- Loading ... -- ", "");
 }
 
 function errorSelect(parent) {
-    wipeAllOptions(parent);
+    wipeAllChildren(parent);
     addOption(parent, " -- Error. See console logs. -- ", "");
 }
 // listeners
 bookSelect.addEventListener('change', () => {
     updateChapterSelect(bookSelect.value);
     wipeOptions(verseSelect, disable=true);
+    addVerseButton.setAttribute('disabled', 'disabled');
 });
 chapterSelect.addEventListener('change', () => {
     updateVerseSelect(bookSelect.value, chapterSelect.value);   
 });
+
 langFormatSelect.addEventListener('change', () => {
     updateLangSelect(langFormatSelect.value);
     wipeOptions(translationSelect, disable=true);
 });
 langSelect.addEventListener('change', () => {
     updateTranslationSelect(langSelect.value);
+    addTranslationButton.setAttribute('disabled', 'disabled');
+});
+translationSelect.addEventListener('change', () => {
+    addTranslationButton.removeAttribute('disabled');
 });
 
 ///////////////////////////////////////
@@ -121,6 +131,7 @@ function updateVerseSelect(book_id, chapter_id) {
     });
 
     verseSelect.removeAttribute('disabled');
+    addVerseButton.removeAttribute('disabled');
 }
 
 function updateChapterSelect(book_id) {
@@ -198,6 +209,16 @@ function loadBookAbbrivs() {
 // --- Text field content handling --- //
 /////////////////////////////////////////
 
+function formVerseLabel(obj) {
+    var bookAbbriv = bookAbbriviations[obj["book_id"]];
+    return `${bookAbbriv} ${obj["chapter_id"]}:${obj["verse_id"]}`;
+}
+
+function formTranslationLabel(obj) {
+    let maxLength = 25;
+    return `${obj["label"].length > maxLength ? obj["label"].slice(0, maxLength - 3) + "..." : obj["label"]}`;
+}
+
 function updateRequestTextBox() {
     var versesString = "";
     var translationsString = "";
@@ -230,13 +251,17 @@ function addVerse() {
             return;
         }
     }
+
+    // add to global list and refresh raw request and tags
     addedVerses.push(objToAdd);
+    updateVerseTags();
     updateRequestTextBox();
 }
 
 function addTranslation() {
     var objToAdd = {
-        "id": translationSelect[translationSelect.selectedIndex].value
+        "id": translationSelect[translationSelect.selectedIndex].value,
+        "label": translationSelect[translationSelect.selectedIndex].text
     };
     // going through all the items to check the dubs
     for (var i = 0; i < addedTranslations.length; i++)
@@ -245,10 +270,70 @@ function addTranslation() {
             logRegular('addTranslation', 'Dublicate met');
             return;
         }
+
+    // add to global list and refresh raw request and tags
     addedTranslations.push(objToAdd);
+    updateTranslationTags();
     updateRequestTextBox();
 }
 
-function addTag(label, parent) {
-    return;
+///////////////////////////
+// --- Tags handling --- //
+///////////////////////////
+
+function updateVerseTags() {
+    wipeAllChildren(verseTagBox);
+    for (var i = 0; i < addedVerses.length; i++) {
+        let label = formVerseLabel(addedVerses[i]);
+        let index = i; // bc we dont want to create a link to `i`
+        let deleteCallback = () => {
+            addedVerses.splice(index, 1);
+            updateVerseTags();
+            updateRequestTextBox();
+        };
+        let tag = createTag(label, deleteCallback);
+
+        verseTagBox.appendChild(tag);
+    }
+}
+
+function updateTranslationTags() {
+    wipeAllChildren(translationTagBox);
+    for (var i = 0; i < addedTranslations.length; i++) {
+        let label = formTranslationLabel(addedTranslations[i]);
+        let index = i; // bc we dont want to create a link to `i`
+        let deleteCallback = () => {
+            addedTranslations.splice(index, 1);
+            updateTranslationTags();
+            updateRequestTextBox();
+        };
+        let tag = createTag(label, deleteCallback);
+
+        translationTagBox.appendChild(tag);
+    }
+}
+
+function createTag(label, deleteCallback) {
+    // // verse tag template
+    // <div class="d-inline bg-light border p-1 mx-1 rounded">
+    //    <p class="d-inline fw-light">LABEL</p>
+    //    <button class="d-inline btn btn-sm btn-outline-danger py-0 px-1">✕</button>
+    // </div>
+    var tagDiv = document.createElement('div');
+    var paragraph = document.createElement('p');
+    var button = document.createElement('button');
+
+    tagDiv.classList.add('d-inline', 'bg-light', 'border', 'p-1', 'mx-1', 'rounded');
+    paragraph.classList.add('d-inline', 'fw-light', 'text-wrap');
+    button.classList.add('d-inline', 'btn', 'btn-sm', 'btn-outline-danger', 'py-0', 'px-1', 'mx-1');
+
+    button.addEventListener('click', deleteCallback);
+
+    paragraph.innerText = label;
+    button.innerText = '✕';
+
+    tagDiv.appendChild(paragraph);
+    tagDiv.appendChild(button);
+
+    return tagDiv;
 }

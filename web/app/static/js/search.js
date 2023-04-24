@@ -18,6 +18,7 @@ const translationTagBox = document.querySelector('#verse_translations_box');
 
 const addVerseButton = document.querySelector('#add_verse_btn');
 const addTranslationButton = document.querySelector('#add_translation_btn');
+
 const requestTextBox = document.querySelector('#request_text_box');
 
 var langFormatValue = null;
@@ -205,6 +206,16 @@ function loadBookAbbrivs() {
     });
 }
 
+function getVerseLine(book_id, chapter, verse, translation_id) {
+    return getJson(`/api/get/verse?book_id=${book_id}&chapter=${chapter}&verse=${verse}&translation_id=${translation_id}`)
+    .then((json) => {
+        return json;
+    })
+    .catch((error) => {
+        console.log(`Could not fetch langs: ${error}`);
+    });
+}
+
 /////////////////////////////////////////
 // --- Text field content handling --- //
 /////////////////////////////////////////
@@ -220,12 +231,13 @@ function formTranslationLabel(obj) {
 }
 
 function updateRequestTextBox() {
-    var versesString = "";
-    var translationsString = "";
-    var delimeter = ":";
+    let versesString = "";
+    let translationsString = "";
+    let delimeter = ":";
     for (var i = 0; i < addedVerses.length; i++) {
         bookAbbriv = bookAbbriviations[addedVerses[i]["book_id"]];
-        versesString += `"${bookAbbriv}"${delimeter}${addedVerses[i]["chapter_id"]}${delimeter}${addedVerses[i]["verse_id"]} `;
+        bookAbbriv = bookAbbriv.replace(/ /g, "_");
+        versesString += `${bookAbbriv}${delimeter}${addedVerses[i]["chapter_id"]}${delimeter}${addedVerses[i]["verse_id"]} `;
     }
     for (var i = 0; i < addedTranslations.length; i++) {
         translationsString += `${addedTranslations[i]["id"]} `;
@@ -336,4 +348,50 @@ function createTag(label, deleteCallback) {
     tagDiv.appendChild(button);
 
     return tagDiv;
+}
+
+/////////////////////////////////
+// --- Parsing raw request --- //
+/////////////////////////////////
+
+function parseVerse(verseString) {
+    let verseData = verseString.split(":");
+    
+    let bookAbbr = verseData[0].replace(/_/g, ' ');
+    let chapterId = verseData[1];
+    let verseId = verseData[2];
+
+    let bookId = -1;
+    for (let id in bookAbbriviations) {
+        if (bookAbbr === bookAbbriviations[id]) {
+            bookId = id;
+            break;
+        }
+    }
+
+    return {
+        "book": bookId,
+        "chapter": chapterId,
+        "verse": verseId
+    }
+}
+
+function parseTranslation(translationString) {
+    return translationString.replace(/[^0-9]+/, "");
+}
+
+function parseRawRequest() {
+    let textToParse = requestTextBox.value;
+    let splitted = textToParse.split(/\n-+\n/);
+
+    let rawVerses = splitted[0].split(" ")
+    let rawTranslations = splitted[1].split(" ");
+
+    let parsedVerses = rawVerses.map(parseVerse);
+    let parsedTranslations = rawTranslations.map(parseTranslation);
+
+    return {
+        "verses": parsedVerses,
+        "translations": parsedTranslations
+    }
 }

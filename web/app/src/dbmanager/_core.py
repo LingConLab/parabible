@@ -109,9 +109,11 @@ class BibleDB():
         """Get verse text in specific translation
 
         Args:
-            book_id (int): id of the book
-            chapter_id (int): id of the chapter
-            verse_id (int): id of the verse
+            verse_id (Tuple[int]) : (
+                book_id (int): id of the book
+                chapter_id (int): id of the chapter
+                verse_id (int): id of the verse
+            )
             translation_id (int): id of the translation
 
         Returns:

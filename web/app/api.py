@@ -141,4 +141,21 @@ def api_get_translations():
 
 @app.route('/api/get/verse')
 def api_db_verse():
-    pass
+    return_d = {}
+    book_id = request.args.get('book_id', default=None, type=int)
+    chapter = request.args.get('chapter', default=None, type=int)
+    verse = request.args.get('verse', default=None, type=int)
+    translation_id = request.args.get('translation_id', default=None, type=int)
+
+    if book_id is None:
+        return f"<h1>Error 400</h1> 'book_id' argument is required", 400
+    if chapter is None:
+        return f"<h1>Error 400</h1> 'chapter' argument is required", 400
+    if verse is None:
+        return f"<h1>Error 400</h1> 'verse' argument is required", 400
+    if translation_id is None:
+        return f"<h1>Error 400</h1> 'translation_id' argument is required", 400
+
+    return_d["verse"] = bible_db.get_verse((book_id, chapter, verse), translation_id)
+
+    return return_d

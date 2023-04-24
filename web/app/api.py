@@ -14,7 +14,7 @@ def api_get_book_abbrs():
     return_d = file_data.get_book_abbrivs()
     return return_d
 
-@app.route('/api/get/chapters')
+@app.route('/api/get/chapter_ids')
 def api_get_chapters():
     """Get ids of chapters in a specific book
 
@@ -35,7 +35,7 @@ def api_get_chapters():
     return_d['chapters'] = file_data.get_chapters_ids(book_id)
     return return_d
 
-@app.route('/api/get/verses')
+@app.route('/api/get/verse_ids')
 def api_get_verse_ids():
     """Get ids of verses in a specific chapter of a specific book
 
@@ -103,9 +103,9 @@ def api_get_langs():
 
     return return_d
 
-@app.route('/api/get/translations')
+@app.route('/api/get/translation_meta')
 def api_get_translations():
-    """Get list of translations in a specific language
+    """Get list of translation's meta in a specific language
 
     Query Args:
         format (str): format of the `lang` argument
@@ -138,3 +138,7 @@ def api_get_translations():
     return_d['translations_list'] = bible_db.get_text_list(format, lang)
 
     return return_d
+
+@app.route('/api/get/verse')
+def api_db_verse():
+    pass

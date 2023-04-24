@@ -118,7 +118,7 @@ function getJson(endpoint) {
 function updateVerseSelect(book_id, chapter_id) {
     selectLoadingState(verseSelect);
 
-    getJson(`/api/get/verses?book_id=${book_id}&chapter_id=${chapter_id}`)
+    getJson(`/api/get/verse_ids?book_id=${book_id}&chapter_id=${chapter_id}`)
     .then((json) => {
         wipeOptions(verseSelect);
         for (let i = 0; i < json['verses'].length; i++) {
@@ -137,7 +137,7 @@ function updateVerseSelect(book_id, chapter_id) {
 function updateChapterSelect(book_id) {
     selectLoadingState(chapterSelect);
 
-    getJson(`/api/get/chapters?book_id=${book_id}`)
+    getJson(`/api/get/chapter_ids?book_id=${book_id}`)
     .then((json) => {
         wipeOptions(chapterSelect);
         for (let i = 0; i < json['chapters'].length; i++) {
@@ -155,7 +155,7 @@ function updateChapterSelect(book_id) {
 function updateTranslationSelect(lang) {
     selectLoadingState(translationSelect);
     
-    getJson(`/api/get/translations?format=${langFormatValue}&lang=${lang}`)
+    getJson(`/api/get/translation_meta?format=${langFormatValue}&lang=${lang}`)
     .then((json) => {
         wipeOptions(translationSelect);
         for (let i = 0; i < json['translations_list'].length; i++) {

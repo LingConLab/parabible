@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block main %}
 <div class="container mx-auto pt-5">
+  <!-- REQUEST FORMING CONTAINER -->
   <div class="container row align-items-start">
     <!-- VERSE CONTAINER -->
     <div class="container col">
@@ -79,11 +80,12 @@
     <!-- RAW REQUEST CONTAINER -->
     <div class="container col">
       <h4>Raw request <a title="You can save raw request text and use it here later. Without having to manually add translations and verses" style="cursor: help;">&#9432;</a></h4>
-      <form method="post" action="nothing">
-        <textarea class="smallborder" name="verse_ids_input" rows="8" cols="20" id="request_text_box"></textarea><br>
-        <input type="submit" class="btn btn-success">
-      </form>
+      <textarea class="smallborder" name="verse_ids_input" rows="8" cols="20" id="request_text_box"></textarea><br>
+      <button class="btn btn-success" onclick="processRawRequest();">Submit</button>
     </div>
+  </div>
+  <!-- RESULT TABLE CONTAINER -->
+  <div id="result_table_container" class="container">
   </div>
 </div>
 <script src="static/js/search.js"></script>

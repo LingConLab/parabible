@@ -145,6 +145,19 @@ class BibleDB():
 
         Returns:
             dict[str, any]: Meta of the text
+
+            possible dict keys:
+                closest_iso_639_3
+                copyright_long
+                copyright_short
+                english_title
+                id
+                iso_15924
+                notes
+                url
+                vernacular_title
+                year_long
+                year_short
         """
         cur = self.conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(

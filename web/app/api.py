@@ -14,6 +14,35 @@ def api_get_book_abbrs():
     return_d = file_data.get_book_abbrivs()
     return return_d
 
+@app.route('/api/get/translation_meta')
+def api_get_translation_meta():
+    """Get meta of a translation by id
+
+    Query Args:
+        id (int): id of the translation
+
+    Returns: json object
+        dict: {
+            'closest_iso_639_3': str,
+            'copyright_long': str,
+            'copyright_short': str,
+            'english_title': str,
+            'id': str,
+            'iso_15924': str,
+            'notes': str,
+            'url': str,
+            'vernacular_title': str,
+            'year_long': str,
+            'year_short': str
+        }
+    """
+    return_d = {}
+    translation_id = request.args.get('id', default=None, type=int)
+    if not translation_id:
+        return f"<h1>Error 400</h1> int 'id' argument is required", 400
+    return_d = bible_db.get_text_meta(translation_id)
+    return return_d
+
 @app.route('/api/get/chapter_ids')
 def api_get_chapters():
     """Get ids of chapters in a specific book
@@ -103,7 +132,7 @@ def api_get_langs():
 
     return return_d
 
-@app.route('/api/get/translation_meta')
+@app.route('/api/get/translations_by_lang')
 def api_get_translations():
     """Get list of translation's meta in a specific language
 

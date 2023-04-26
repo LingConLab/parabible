@@ -2,8 +2,8 @@
 // --- Initialisation --- //
 ////////////////////////////
 
-const rootEndPoint = "/parabible";
-//const rootEndPoint = "";
+//const rootEndPoint = "/parabible";
+const rootEndPoint = "";
 const host = window.location.protocol + "//" + window.location.host + rootEndPoint;
 
 const bookSelect = document.querySelector('#book_select');
@@ -20,19 +20,29 @@ const addVerseButton = document.querySelector('#add_verse_btn');
 const addTranslationButton = document.querySelector('#add_translation_btn');
 
 const requestTextBox = document.querySelector('#request_text_box');
+const tableContainer = document.querySelector('#result_table_container');
 
-var langFormatValue = null;
-var addedVerses = [];
-var addedTranslations = [];
+let langFormatValue = null;
+let addedVerses = [];
+let addedTranslations = [];
 
-var bookAbbriviations = null;
+let bookAbbriviations = null;
 loadBookAbbrivs();
+
+let tableCellElements = null;
 
 function logRegular(prefx, msg) {
     console.log(`[${prefx}] ${msg}`);
 }
 function logRequest(url) {
     logRegular('Request', url);
+}
+function resetTableCellElements() {
+    tableCellElements ={
+        "col_heads": [],
+        "row_heads": [],
+        "cells": []
+    };
 }
 
 ///////////////////////////////////
@@ -156,7 +166,7 @@ function updateChapterSelect(book_id) {
 function updateTranslationSelect(lang) {
     selectLoadingState(translationSelect);
     
-    getJson(`/api/get/translation_meta?format=${langFormatValue}&lang=${lang}`)
+    getJson(`/api/get/translations_by_lang?format=${langFormatValue}&lang=${lang}`)
     .then((json) => {
         wipeOptions(translationSelect);
         for (let i = 0; i < json['translations_list'].length; i++) {
@@ -216,13 +226,40 @@ function getVerseLine(book_id, chapter, verse, translation_id) {
     });
 }
 
+function getTranslationMeta(translation_id) {
+    return getJson(`/api/get/translation_meta?id=${translation_id}`)
+    .then((json) => {
+        return json;
+    })
+    .catch((error) => {
+        console.log(`Could not fetch langs: ${error}`);
+    });
+}
+
 /////////////////////////////////////////
 // --- Text field content handling --- //
 /////////////////////////////////////////
 
-function formVerseLabel(obj) {
-    var bookAbbriv = bookAbbriviations[obj["book_id"]];
-    return `${bookAbbriv} ${obj["chapter_id"]}:${obj["verse_id"]}`;
+function formTranslationLabelFromMeta(metaObj) {
+    let title = "No title";
+    if (metaObj['vernacular_title'])
+        title = metaObj['vernacular_title'];
+    else if (metaObj['english_title'])
+        title = metaObj['english_title'];
+
+    let iso_639 = metaObj['closest_iso_639_3'];
+    let year = metaObj['year_short'];
+
+    return `[${iso_639} ${year}] ${title}`;
+}
+
+function formVerseLabelFromObj(obj) {
+    return formVerseLabel(obj['book_id'], obj['chapter_id'], obj['verse_id']);
+}
+
+function formVerseLabel(book_id, chapter, verse) {
+    var bookAbbriv = bookAbbriviations[book_id];
+    return `${bookAbbriv} ${chapter}:${verse}`;
 }
 
 function formTranslationLabel(obj) {
@@ -296,7 +333,7 @@ function addTranslation() {
 function updateVerseTags() {
     wipeAllChildren(verseTagBox);
     for (var i = 0; i < addedVerses.length; i++) {
-        let label = formVerseLabel(addedVerses[i]);
+        let label = formVerseLabelFromObj(addedVerses[i]);
         let index = i; // bc we dont want to create a link to `i`
         let deleteCallback = () => {
             addedVerses.splice(index, 1);
@@ -356,8 +393,9 @@ function createTag(label, deleteCallback) {
 
 function parseVerse(verseString) {
     let verseData = verseString.split(":");
-    
-    let bookAbbr = verseData[0].replace(/_/g, ' ');
+    verseData[0] = verseData[0].replace(/_/g, ' ');
+
+    let bookAbbr = verseData[0];
     let chapterId = verseData[1];
     let verseId = verseData[2];
 
@@ -370,6 +408,7 @@ function parseVerse(verseString) {
     }
 
     return {
+        "label": formVerseLabel(bookId, chapterId, verseId),
         "book": bookId,
         "chapter": chapterId,
         "verse": verseId
@@ -377,7 +416,10 @@ function parseVerse(verseString) {
 }
 
 function parseTranslation(translationString) {
-    return translationString.replace(/[^0-9]+/, "");
+    return {
+        "label": "Translation Label",
+        "id": translationString.replace(/[^0-9]+/, "")
+    }
 }
 
 function parseRawRequest() {
@@ -393,5 +435,102 @@ function parseRawRequest() {
     return {
         "verses": parsedVerses,
         "translations": parsedTranslations
+    }
+}
+
+/////////////////////////////////
+// --- Request processing  --- //
+/////////////////////////////////
+
+function processRawRequest() {
+    let parsedData = parseRawRequest();
+    let verseData = parsedData["verses"];
+    let translationData = parsedData["translations"];
+    createDataTable(verseData.length, translationData.length);
+
+    for (let v = 0; v < verseData.length; v++) 
+        tableCellElements['row_heads'][v].textContent = verseData[v]['label'];
+
+    for (let t = 0; t < translationData.length; t++) {
+        tableCellElements["col_heads"][t].textContent = 'Loading...';
+        getTranslationMeta(translationData[t]["id"])
+        .then((json) => {
+            let label = formTranslationLabelFromMeta(json);
+            tableCellElements["col_heads"][t].textContent = label;
+        })
+        for (let v = 0; v < verseData.length; v++) {
+            tableCellElements['cells'][v][t].textContent = 'Loading...';
+            getVerseLine(verseData[v]["book"], verseData[v]["chapter"], verseData[v]["verse"], translationData[t]["id"])
+            .then((json) => {
+                tableCellElements['cells'][v][t].textContent = json["verse"] ? json["verse"] : 'No data';
+            })
+        }
+    }
+}
+
+/////////////////////////////////
+// --- Main table forming  --- //
+/////////////////////////////////
+
+function createDataTableCell(content='Empty cell') {
+    let cell = document.createElement('td');
+    cell.textContent = content;
+    return cell;
+}
+
+function createDataTableHeadCell(scope, content='Empty head cell') {
+    let cell = document.createElement('th');
+    cell.classList.add('table-success');
+    if (scope != null) cell.setAttribute('scope', scope);
+    cell.textContent = content;
+    return cell;
+}
+
+function createDataTable(rowAmount, colAmount) {
+    /*
+        Results of this function executed:
+            0. `tableContainer`'s children deleted, `tableCellElements` list viped
+            1. Table element is formed.
+            2. Table Element is added to `tableContainer` div
+            3. All cell Elements are added to `tableCellElements['cells']`
+                - List is 2 dimentional (list of lists) tableCellElements[x][y]
+                    - `x` axis stands for row, `y` - for column
+                    - in other words `x` stands for verse, `y` - for translation
+                - Each cell may be modified through this list
+    */
+    wipeAllChildren(tableContainer);
+    resetTableCellElements();
+
+    let table = document.createElement('table');
+    let tableHead = document.createElement('thead');
+    let tableBody = document.createElement('tbody');
+    table.appendChild(tableHead);
+    table.appendChild(tableBody);
+    tableContainer.appendChild(table);
+
+    table.classList.add('table', 'table-bordered');
+
+    // collumn of verses
+    tableHead.appendChild(createDataTableHeadCell(null, 'Verse'));
+    // headers of collumns
+    for (let i = 0; i < colAmount; i++) {
+        let cellHead = createDataTableHeadCell('col', `${i}`);
+        tableCellElements['col_heads'].push(cellHead);
+        tableHead.appendChild(cellHead);
+    }
+
+    for (let i = 0; i < rowAmount; i++) {
+        let rowCellElementList = [];
+        let row = document.createElement('tr');
+        let rowHead = createDataTableHeadCell('row', `${i}'s head`);
+        tableCellElements['row_heads'].push(rowHead);
+        row.appendChild(rowHead);
+        for (let j = 0; j < colAmount; j++) {
+            cell = createDataTableCell(`${i} ${j}`);
+            rowCellElementList.push(cell);
+            row.appendChild(cell);
+        }
+        tableCellElements['cells'].push(rowCellElementList);
+        tableBody.appendChild(row);
     }
 }

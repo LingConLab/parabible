@@ -481,6 +481,7 @@ function createDataTableCell(content='Empty cell') {
 function createDataTableHeadCell(scope, content='Empty head cell') {
     let cell = document.createElement('th');
     cell.classList.add('table-success');
+    if (scope === 'row') cell.classList.add('text-nowrap');
     if (scope != null) cell.setAttribute('scope', scope);
     cell.textContent = content;
     return cell;

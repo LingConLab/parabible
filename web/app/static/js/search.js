@@ -153,9 +153,11 @@ bookSelect.addEventListener('change', () => {
  * New chapter selected ->
  * -> load it's verses from api and populate verse select with verse options ->
  * -> (skipped) nothing to clear (since it has no following select menus) ->
+ * -> disable addVerse button
  */
 chapterSelect.addEventListener('change', () => {
     updateVerseSelect(bookSelect.value, chapterSelect.value);   
+    addVerseButton.setAttribute('disabled', 'disabled');
 });
 /**
  * New verse selected ->
@@ -192,6 +194,13 @@ langSelect.addEventListener('change', () => {
 translationSelect.addEventListener('change', () => {
     addTranslationButton.removeAttribute('disabled');
 });
+
+/**
+ * 
+ */
+requestTextBox.addEventListener('input', () => {
+    parseRawRequest();
+})
 
 ///////////////////////////////////////
 // --------    API calls    -------- //
@@ -640,11 +649,27 @@ function parseRawRequest() {
     let textToParse = requestTextBox.value;
     let splitted = textToParse.split(/\n-+\n/);
 
-    let rawVerses = splitted[0].split(" ")
+    if (splitted.length < 2) {
+        displayInfoBox(rawReqestErrorBox, 'Add at least one verse and one translation first.', 'warn');
+        return;
+    }
+
+    let rawVerses = splitted[0].split(" ");
+    if (rawVerses.length <= 1 && rawVerses[0] == "") {
+        displayInfoBox(rawReqestErrorBox, 'Add at least one verse.', 'warn');
+        return;
+    }
     let rawTranslations = splitted[1].split(" ");
+    console.log(rawTranslations);
+    if (rawTranslations.length <= 1 && rawTranslations[0] == "") {
+        displayInfoBox(rawReqestErrorBox, 'Add at least one translation.', 'warn');
+        return;
+    }
 
     let parsedVerses = rawVerses.map(parseVerse);
     let parsedTranslations = rawTranslations.map(parseTranslation);
+
+    hideErrorBox(rawReqestErrorBox);
 
     return {
         "verses": parsedVerses,
@@ -664,6 +689,7 @@ function parseRawRequest() {
  */
 function processRawRequest() {
     let parsedData = parseRawRequest();
+    if (!parsedData) return;
     let verseData = parsedData["verses"];
     let translationData = parsedData["translations"];
     createDataTable(verseData.length, translationData.length);

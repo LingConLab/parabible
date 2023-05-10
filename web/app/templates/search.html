@@ -3,6 +3,10 @@
 <div class="container mx-auto pt-5">
   <!-- REQUEST FORMING CONTAINER -->
   <div class="container row align-items-start">
+    <!-- Error box -->
+    <div id="global_error_box" class="alert alert-danger text-break d-none" role="alert">
+      Global page error box.
+    </div>
     <!-- VERSE CONTAINER -->
     <div class="container col">
       <!-- Title -->
@@ -36,6 +40,10 @@
       <!-- Verse add button -->
       <div class="container py-1">
         <button id="add_verse_btn" disabled onclick="addVerse();" class="btn btn-primary">Add verse</button>
+      </div>
+      <!-- Error box -->
+      <div id="verse_error_box" class="alert alert-danger text-break d-none" role="alert">
+        Verse block error box.
       </div>
       <!-- Verse tags -->
       <div id="verse_tag_box" class="container py-2"></div>
@@ -74,6 +82,10 @@
       <div class="container py-1">
         <button id="add_translation_btn" disabled onclick="addTranslation();" class="btn btn-primary">Add translation</button>
       </div>
+      <!-- Error box -->
+      <div id="translation_error_box" class="alert alert-danger text-break d-none" role="alert">
+        Translation block error box.
+      </div>
       <!-- Translation tags -->
       <div id="verse_translations_box" class="container py-2"></div>
     </div>
@@ -82,6 +94,10 @@
       <h4>Raw request <a title="You can save raw request text and use it here later. Without having to manually add translations and verses" style="cursor: help;">&#9432;</a></h4>
       <textarea class="smallborder" name="verse_ids_input" rows="8" cols="20" id="request_text_box"></textarea><br>
       <button class="btn btn-success" onclick="processRawRequest();">Submit</button>
+      <!-- Error box -->
+      <div id="raw_request_error_box" class="alert alert-danger text-break d-none" role="alert">
+        Raw request block error box.
+      </div>
     </div>
   </div>
   <!-- RESULT TABLE CONTAINER -->

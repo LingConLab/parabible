@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from json import load
 from collections import defaultdict
 import logging
@@ -111,10 +111,10 @@ def get_book_abbrivs() -> dict:
 book_struct_file = data_dir.joinpath(__book_struct_file_name)
 __book_struct_dict = load_dict_from_file(__book_struct_file_name)
 
-def get_chapters_ids(book_id: str | int) -> list:
+def get_chapters_ids(book_id: Union[str, int]) -> list:
     if __book_struct_dict:
         return list(__book_struct_dict[str(book_id)].keys())
     
-def get_verses_ids(book_id: str | int, chapter_id: str | int) -> list:
+def get_verses_ids(book_id: Union[str, int], chapter_id: Union[str, int]) -> list:
     if __book_struct_dict:
         return __book_struct_dict[str(book_id)][str(chapter_id)]

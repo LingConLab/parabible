@@ -52,7 +52,7 @@ def api_get_chapters():
 
     Returns: json object
         dict: {
-            'chapters': list[int]
+            'chapters': List[int]
         }
     """
     return_d = {}
@@ -74,7 +74,7 @@ def api_get_verse_ids():
 
     Returns: json object
         dict: {
-            'verses': list[int]
+            'verses': List[int]
         }
     """
     return_d = {}
@@ -101,7 +101,7 @@ def api_get_langs():
 
     Returns: json object
         dict: {
-            "lang_list": list[
+            "lang_list": List[
                 dict: {
                     "label": str, 
                     "val": str
@@ -143,8 +143,8 @@ def api_get_translations():
 
     Returns: json object
         dict: {
-            "translations_list": list[
-                list[
+            "translations_list": List[
+                List[
                     int: id of a translation,
                     str: Closest iso 639-3 tag,
                     str: Translation literal name,

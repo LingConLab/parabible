@@ -1,3 +1,4 @@
+from typing import List, Dict
 from os import listdir as os_listdir
 from pathlib import Path
 from re import match as regex_match, search as regex_search
@@ -10,14 +11,14 @@ from .line_blacklist import blacklist
 logging.basicConfig(format="%(levelname)s %(message)s", level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-def __get_files(str_path) -> list[Path]:
+def __get_files(str_path) -> List[Path]:
     """Get all file names from inputed path
 
     Args:
         `rel_path` (str|Path): directory path
 
     Returns:
-        list[Path]: list of all file paths in the directory
+        List[Path]: list of all file paths in the directory
     """
 
     path = Path(str_path)
@@ -67,7 +68,7 @@ def __get_file_lines(file_name: str) -> str:
                 continue
             yield line
 
-def parse_file(file_name: Path, empty_value = None) -> dict[str, dict]:
+def parse_file(file_name: Path, empty_value = None) -> Dict[str, dict]:
     """ Get a dict of parsed data
 
     Args:

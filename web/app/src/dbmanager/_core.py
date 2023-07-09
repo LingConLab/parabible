@@ -1,4 +1,5 @@
 import psycopg2
+from typing import List, Dict
 from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
 from typing import Literal
@@ -63,11 +64,11 @@ class BibleDB():
         )
     
     @check_conn
-    def get_text_list(self, lang_format: str, lang: str, collumns: list[str] = None) -> list[dict]:
+    def get_text_list(self, lang_format: str, lang: str, collumns: List[str] = None) -> List[dict]:
         """Return ids and other collumns of all the texts
 
         Args:
-            collumns (list[str], optional): If None, returns defualt set of db collumns.
+            collumns (List[str], optional): If None, returns defualt set of db collumns.
             You can override it
 
             Default: [
@@ -77,7 +78,7 @@ class BibleDB():
             ]
 
         Returns:
-            list[dict]: list of entries dicts. Col name: value
+            List[dict]: list of entries dicts. Col name: value
         """
         if not lang_format in ["closest_iso_639_3", "iso_15924"]:
             return []
@@ -137,14 +138,14 @@ class BibleDB():
         return result[0] if result else result
 
     @check_conn
-    def get_text_meta(self, id: int) -> dict[str, any]:
+    def get_text_meta(self, id: int) -> Dict[str, any]:
         """Get meta of the text by its id
 
         Args:
             id (int): Id of the text
 
         Returns:
-            dict[str, any]: Meta of the text
+            Dict[str, any]: Meta of the text
 
             possible dict keys:
                 closest_iso_639_3
@@ -297,7 +298,7 @@ class BibleDB():
         )
 
     @check_conn
-    def __insert_verse_bulk(self, data_list: list[dict], begin: int, end: int, translation_id: int, cur):
+    def __insert_verse_bulk(self, data_list: List[dict], begin: int, end: int, translation_id: int, cur):
         """`begin`, `end` are indexes of current window.
         In order to not use additional memory.
         We dont slice or copy subarray, we pass it and tell the borders"""
@@ -318,10 +319,10 @@ class BibleDB():
         )
 
     @check_conn
-    def __insert_translation_meta(self, meta: dict[str]) -> int:
+    def __insert_translation_meta(self, meta: Dict[str, str]) -> int:
         """
         Args:
-            meta (dict[str]): meta data dict. It will replace missing key values with None.
+            meta (Dict[str]): meta data dict. It will replace missing key values with None.
 
         Raises:
             Exception: if db returns anything but integer

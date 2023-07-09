@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 from json import load
 from collections import defaultdict
 import logging
@@ -94,7 +95,7 @@ def get_book_short_title(book_id: int) -> str:
     else:
         return book_id
 
-def get_book_ids() -> list[int]:
+def get_book_ids() -> List[int]:
     if __book_names_dict:
         return list(__book_names_dict.keys())
     else:

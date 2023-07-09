@@ -1,5 +1,5 @@
 import psycopg2
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
 from typing import Literal
@@ -106,7 +106,7 @@ class BibleDB():
         return result
 
     @check_conn
-    def get_verse(self, verse_id: tuple[int], translation_id: int) -> str:
+    def get_verse(self, verse_id: Tuple[int], translation_id: int) -> str:
         """Get verse text in specific translation
 
         Args:

@@ -2,7 +2,7 @@
 // --- Initialisation --- //
 ////////////////////////////
 
-const rootEndPoint = "/parabible";
+const rootEndPoint = "/nginx_root/parabible";
 //const rootEndPoint = "";
 const host = window.location.protocol + "//" + window.location.host + rootEndPoint;
 // Verse selection containers

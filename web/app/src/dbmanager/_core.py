@@ -28,7 +28,7 @@ def check_conn(func):
     return wrapped
 
 class BibleDB():
-    def __init__(self, host_options: list = None) -> None:
+    def __init__(self, host_options: list = None, db_port: str = "5432") -> None:
         """Initializates connection and creates tables if dont exist"""
 
         if not host_options:
@@ -41,7 +41,7 @@ class BibleDB():
         self.DB_NAME = "parabible"
         self.DB_USER = "dev"
         self.DB_PASS = "dev"
-        self.DB_PORT = "5432"
+        self.DB_PORT = db_port
 
         for host in host_options:
             try:

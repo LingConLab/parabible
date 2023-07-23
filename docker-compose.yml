@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   db:
-    image: database
+    image: parabible-postgresql
     cpus: 0.2
     mem_limit: 256m
     restart: always
@@ -13,7 +13,7 @@ services:
       - ./postgres/env_file
     command: -p 5432
     ports:
-      - 5432:5432
+      - 11398:5432
     networks:
       - db_backend
     
@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
     ports: 
-      - 14001:80
+      - 11397:80
     networks:
       - db_backend
     # !!!
@@ -38,11 +38,11 @@ services:
     # !!!
 
   flask-front:
-    image: flask-front
+    image: parabible-flask
     cpus: 0.2
     mem_limit: 256m
     restart: always
-    container_name: parabible-flask
+    container_name: parabible-front
     depends_on:
       - db
     build:
@@ -50,7 +50,7 @@ services:
     env_file:
       - ./web/env_file
     ports:
-      - 14000:5000
+      - 11399:5000
     networks:
       - db_backend
 

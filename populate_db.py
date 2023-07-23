@@ -75,7 +75,7 @@ def parse():
     logger.info(f"Parsing .txt files into DB...")
 
     try:
-        local_bible_db = BibleDB()
+        local_bible_db = BibleDB(db_port="11398")
     except OperationalError as e:
         logger.error(e)
         logger.error("Cant connect to the database. Is postgres DB up?")

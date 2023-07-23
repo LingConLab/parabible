@@ -1,6 +1,6 @@
 from flask import request
 
-from . import app
+from .app import app
 from .src.file_handling import file_data
 from .src.dbmanager import BibleDB
 from . import const

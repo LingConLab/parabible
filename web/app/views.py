@@ -1,4 +1,4 @@
-from . import app, bible_db
+from . import app
 from flask import render_template
 import logging
 

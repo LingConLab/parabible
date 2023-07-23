@@ -1,8 +1,11 @@
 from flask import request
 
-from . import app, bible_db
+from . import app
 from .src.file_handling import file_data
+from .src.dbmanager import BibleDB
 from . import const
+
+bible_db = BibleDB()
 
 @app.route('/api/get/book_title_abbrs')
 def api_get_book_abbrs():

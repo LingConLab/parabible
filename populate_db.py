@@ -28,6 +28,11 @@ arg_parser.add_argument(
     action='store_true',
     help='Do not populate db. Create index only'
 )
+arg_parser.add_argument(
+    '-p', '--db_port',
+    default="5432",
+    help='Specify database port'
+)
 args = arg_parser.parse_args()
 urls = {
     'debug': "http://91.200.84.6/parabible-data/debug_pb_corpus.zip",
@@ -75,7 +80,7 @@ def parse():
     logger.info(f"Parsing .txt files into DB...")
 
     try:
-        local_bible_db = BibleDB(db_port="11398")
+        local_bible_db = BibleDB(db_port=args.db_port)
     except OperationalError as e:
         logger.error(e)
         logger.error("Cant connect to the database. Is postgres DB up?")
@@ -99,7 +104,7 @@ def update_book_structure_dict():
     from web.app.src.file_handling import file_data
     logger.info(f"Creating books structure index dicts...")
     try:
-        local_bible_db = BibleDB()
+        local_bible_db = BibleDB(db_port=args.db_port)
     except OperationalError as e:
         logger.error(e)
         logger.error("Cant connect to the database. Is postgres DB up?")

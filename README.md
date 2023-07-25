@@ -3,10 +3,12 @@ Consists of a flask python app and a postresql database. They exist in two diffe
 
 For a quick start run these:
 <pre>
-docker-compose up
 pip3 install wget tqdm psycopg2
-python3 populate_db.py -m full
+docker compose up db -d
+python3 populate_db.py -m full -p [database_port_here*]
+docker compose up -d
 </pre>
+ \*you can find db port in [docker-compose.yml](docker-compose.yml) in `db` service. You will see ports: - port1:port2. You need port1, the first one.
 
 # Overview
 

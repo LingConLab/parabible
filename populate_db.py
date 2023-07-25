@@ -24,11 +24,6 @@ arg_parser.add_argument(
     help='Delete .zip and extracted files in the end (doesnt work for now)'
 )
 arg_parser.add_argument(
-    '-i', '--index_only',
-    action='store_true',
-    help='Do not populate db. Create index only'
-)
-arg_parser.add_argument(
     '-p', '--db_port',
     default="5432",
     help='Specify database port'
@@ -96,32 +91,11 @@ def parse():
         logger.debug(f"Processing {file_name}")
 
         local_bible_db.insert_new_text(text_data)
-
-def update_book_structure_dict():
-    from tqdm import tqdm
-    from json import dump
-    from web.app.src.dbmanager import BibleDB
-    from web.app.src.file_handling import file_data
-    logger.info(f"Creating books structure index dicts...")
-    try:
-        local_bible_db = BibleDB(db_port=args.db_port)
-    except OperationalError as e:
-        logger.error(e)
-        logger.error("Cant connect to the database. Is postgres DB up?")
-        logger.info("Make sure that the database is up")
-        return
     
-    result_dict = {}
-    for b_id in tqdm(file_data.get_book_ids(), desc="Books"):
-        result_dict[b_id] = {}
-        for ch_id in local_bible_db.get_chapters(b_id):
-            result_dict[b_id][ch_id] = local_bible_db.get_verse_ids(b_id, ch_id)
-    with open(file_data.book_struct_file, 'w', encoding='utf-8') as f:
-        dump(result_dict, f, indent=4)
+    local_bible_db.conn.commit()
+    logger.info(f"Done! All data was copied to the database. You may now delete the *_pb_corpus.zip file and {corpus_dir} folder.")
 
 if __name__ == "__main__":
-    if not args.index_only:
-        file_name = get_zip()
-        unzip(file_name)
-        parse()
-    update_book_structure_dict()
+    file_name = get_zip()
+    unzip(file_name)
+    parse()

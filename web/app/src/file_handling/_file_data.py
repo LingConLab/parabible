@@ -9,7 +9,6 @@ logger.setLevel(logging.DEBUG)
 
 # Section to edit
 __data_dir_name = "data"
-__book_struct_file_name = "books_structure.json"
 __iso_index_file_name = "iso_639-3_index.json"
 __book_names_file_name = "book_names.json"
 
@@ -107,14 +106,8 @@ def get_book_abbrivs() -> dict:
     else:
         return None
 
-## Books structure
-book_struct_file = data_dir.joinpath(__book_struct_file_name)
-__book_struct_dict = load_dict_from_file(__book_struct_file_name)
-
 def get_chapters_ids(book_id: Union[str, int]) -> list:
-    if __book_struct_dict:
-        return list(__book_struct_dict[str(book_id)].keys())
+    raise NotImplemented()
     
 def get_verses_ids(book_id: Union[str, int], chapter_id: Union[str, int]) -> list:
-    if __book_struct_dict:
-        return __book_struct_dict[str(book_id)][str(chapter_id)]
+    raise NotImplemented()

@@ -1,5 +1,5 @@
 import psycopg2
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Union
 from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
 from typing import Literal
@@ -37,7 +37,7 @@ class BibleDB():
         host_options.append('0.0.0.0')
         host_options.append('localhost')
         host_options.append('db')
-
+        
         self.DB_NAME = "parabible"
         self.DB_USER = "dev"
         self.DB_PASS = "dev"
@@ -49,18 +49,20 @@ class BibleDB():
                 logger.info(f"Connected to host {host}")
                 break
             except psycopg2.OperationalError as e:
-                logger.info(f"Failed to connect to the host option {host}\n{e}")
+                logger.debug(f"Failed to connect to the host option {host}\n{e}")
         else:
             # raise OperationalError exeption
             self.connect(host_options[0])
 
     def connect(self, host):
+        logger.info(f"Connection to {host}:{self.DB_PORT}")
         return psycopg2.connect(
-            database    =   self.DB_NAME,
-            user        =   self.DB_USER,
-            password    =   self.DB_PASS,
-            host        =   host,
-            port        =   self.DB_PORT
+            database        =   self.DB_NAME,
+            user            =   self.DB_USER,
+            password        =   self.DB_PASS,
+            host            =   host,
+            port            =   self.DB_PORT,
+            connect_timeout =   5
         )
     
     @check_conn
@@ -138,7 +140,7 @@ class BibleDB():
         return result[0] if result else result
 
     @check_conn
-    def get_text_meta(self, id: int) -> Dict[str, any]:
+    def get_translation_meta(self, id: int) -> Dict[str, any]:
         """Get meta of the text by its id
 
         Args:
@@ -172,30 +174,139 @@ class BibleDB():
         return dict(cur.fetchone())
 
     @check_conn
-    def get_chapters(self, book_id: int):
+    def get_books(self, translation_ids: Union[int, List[int]], mode: Literal["any", "all"] = "all") -> List[int]:
+        """Get ids of books that have at least one translated verse in ALL or AT LEAST ONE given translation(s).
+
+        Args:
+            translation_ids (int | List[int]): id(s) of translation(s)
+            mode (str): if "all" option is passed, return ids of books that contain translated verses in ALL translations
+                        if "any" option is passed, return ids of books that contain translated verses in AT LEAST ONE translation
+
+        Returns:
+            List[int]: list of book ids
+        """        
+        if isinstance(translation_ids, int): translation_ids = [translation_ids]
         cur = self.conn.cursor()
-        cur.execute(
-            """ SELECT chapter_id FROM verses
-                WHERE book_id = %s
-                GROUP BY chapter_id; """, 
-            (book_id,)
-        )
+        if mode == "all":
+            cur.execute(
+                """ SELECT book_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s
+                        GROUP BY book_id
+                        HAVING COUNT(DISTINCT translation_id) = %(translation_count)s
+                        ORDER BY book_id; """, 
+                {'translation_ids': tuple(translation_ids),
+                 'translation_count': len(translation_ids)}
+            )
+        elif mode == "any":
+            cur.execute(
+                """ SELECT book_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s
+                        GROUP BY book_id
+                        ORDER BY book_id; """, 
+                {'translation_ids': tuple(translation_ids)}
+            )
+        else:
+            raise ValueError(f"'mode' argument may be only 'any' or 'all'. Got '{mode}'")
+        
         result = cur.fetchall()
-        return result if not result else sorted( i[0] for i in result )
+        return result if not result else [i[0] for i in result]
+
+    @check_conn
+    def get_chapters(self, translation_ids: Union[int, List[int]], book_id: int, mode: Literal["any", "all"] = "all") -> List[int]:
+        """Get ids of chapters in a given book that have at least one translated verse in ALL or AT LEAST ONE given translation(s).
+
+        Args:
+            translation_ids (int | List[int]): id(s) of translation(s)
+            book_id (int): id of a book
+            mode (str): if "all" option is passed, return ids of books that contain translated verses in ALL translations
+                        if "any" option is passed, return ids of books that contain translated verses in AT LEAST ONE translation
+
+        Returns:
+            List[int]: list of chapter numbers (ids)
+        """
+        if isinstance(translation_ids, int): translation_ids = [translation_ids]
+        cur = self.conn.cursor()
+        if mode == "all":
+            cur.execute(
+                """ SELECT chapter_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s AND
+                            book_id = %(book_id)s
+                        GROUP BY chapter_id
+                        HAVING COUNT(DISTINCT translation_id) = %(translation_count)s
+                        ORDER BY chapter_id; """, 
+                {'translation_ids': tuple(translation_ids),
+                 'book_id': book_id,
+                 'translation_count': len(translation_ids)}
+            )
+        elif mode == "any":
+            cur.execute(
+                """ SELECT chapter_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s AND
+                            book_id = %(book_id)s
+                        GROUP BY chapter_id
+                        ORDER BY chapter_id; """, 
+                {'translation_ids': tuple(translation_ids),
+                 'book_id': book_id}
+            )
+        else:
+            raise ValueError(f"'mode' argument may be only 'any' or 'all'. Got '{mode}'")
+        
+        result = cur.fetchall()
+        return result if not result else [i[0] for i in result]
     
     @check_conn
-    def get_verse_ids(self, book_id: int, chapter_id: int):
+    def get_verse_ids(self, translation_ids: Union[int, List[int]], book_id: int, chapter_id: int, mode: Literal["any", "all"] = "all") -> List[int]:
+        """Get ids of verses in a given book and chapter that are translated in ALL or AT LEAST ONE given translation(s).
+
+        Args:
+            translation_ids (int | List[int]): id(s) of translation(s)
+            book_id (int): id of a book
+            chapter_id (int): id of a chapter
+            mode (str): if "all" option is passed, return ids of books that contain translated verses in ALL translations
+                        if "any" option is passed, return ids of books that contain translated verses in AT LEAST ONE translation
+
+        Returns:
+            List[int]: list of verse numbers (ids)
+        """
+        if isinstance(translation_ids, int): translation_ids = [translation_ids]
         cur = self.conn.cursor()
-        cur.execute(
-            """ SELECT verse_id FROM verses
-                WHERE
-                    book_id = %s AND
-                    chapter_id = %s
-                GROUP BY verse_id; """, 
-            (book_id, chapter_id)
-        )
+        if mode == "all":
+            cur.execute(
+                """ SELECT verse_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s   AND
+                            book_id         = %(book_id)s           AND
+                            chapter_id      = %(chapter_id)s
+                        GROUP BY verse_id
+                        HAVING COUNT(DISTINCT translation_id) = %(translation_count)s
+                        ORDER BY verse_id; """, 
+                {'translation_ids': tuple(translation_ids),
+                 'book_id': book_id,
+                 'chapter_id': chapter_id,
+                 'translation_count': len(translation_ids)}
+            )
+        elif mode == "any":
+            cur.execute(
+                """ SELECT verse_id FROM verses 
+                        WHERE
+                            translation_id in %(translation_ids)s   AND
+                            book_id         = %(book_id)s           AND
+                            chapter_id      = %(chapter_id)s
+                        GROUP BY verse_id
+                        ORDER BY verse_id; """, 
+                {'translation_ids': tuple(translation_ids),
+                 'book_id': book_id,
+                 'chapter_id': chapter_id}
+            )
+        else:
+            raise ValueError(f"'mode' argument may be only 'any' or 'all'. Got '{mode}'")
+        
         result = cur.fetchall()
-        return result if not result else sorted( i[0] for i in result )
+        return result if not result else [i[0] for i in result]
 
     @check_conn
     def insert_new_text(self, data: dict) -> None:
@@ -239,8 +350,10 @@ class BibleDB():
         
         logger.debug(f"inserting verses of text with id = {translation_id} ({data['meta']['vernacular_title']})")
 
+        # 'straight forward' way to do this. This inserts verses one by one which is slow
         """ for verse in data["data"]["lines"]:
             self.__insert_verse(verse, translation_id, verse_cursor) """
+        # here we insert verses in bulk 100 verses at a time. This drastically improves speed of inserting new translation
         bulk_size = 100
         verse_amount = len(data["data"]["lines"])
 
@@ -278,6 +391,19 @@ class BibleDB():
 
     @check_conn
     def __form_verse_values_string(self, data: dict, translation_id: int, cur) -> str:
+        """Helper func for verse insertion. 
+        Converts safely data["book_id"], data["chapter_id"], data["verse_id"], translation_id, data["line"]
+        to sql string
+        (40, 1, 1, 12, "verse line goes here ...")
+
+        Args:
+            data (dict)
+            translation_id (int)
+            cur (_type_)
+
+        Returns:
+            str: sql formatted string
+        """        
         return cur.mogrify(
             "(%s, %s, %s, %s, %s)",
             (
@@ -357,6 +483,18 @@ class BibleDB():
             return returned_id
         else:
             raise Exception(f"returned_id expected to be int. Got {returned_id} ({type(returned_id)})")
+
+    @check_conn
+    def get_index_size(self, table_name: str, index_name: str) -> str:
+        cur = self.conn.cursor()
+        cur.execute(
+            """ SELECT pg_size_pretty(pg_total_relation_size('%s')) AS index_size
+                FROM pg_indexes
+                WHERE tablename = '%s' AND indexname = '%s'; """, 
+            (index_name, table_name, index_name)
+        )
+        result = cur.fetchall()
+        return result if not result else [i[0] for i in result]
 
     @check_conn
     def __is_dublicate(self, meta: dict) -> bool:

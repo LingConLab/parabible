@@ -10,6 +10,8 @@ const bookSelect = document.querySelector('#book_select');
 const chapterSelect = document.querySelector('#chapter_select');
 const verseSelect = document.querySelector('#verse_select');
 const verseTagBox = document.querySelector('#verse_tag_box');
+const verseFilteringModeAll = document.querySelector('#verse_filtering_mode_all')
+const verseFilteringModeAny = document.querySelector('#verse_filtering_mode_any')
 // Translation selection containers
 const langFormatSelect = document.querySelector('#lang_format_select');
 const langSelect = document.querySelector('#lang_select');
@@ -202,6 +204,13 @@ requestTextBox.addEventListener('input', () => {
     parseRawRequest();
 })
 
+verseFilteringModeAll.addEventListener('change', () => {
+    updateAllVerseSelects();
+});
+verseFilteringModeAny.addEventListener('change', () => {
+    updateAllVerseSelects();
+});
+
 ///////////////////////////////////////
 // --------    API calls    -------- //
 ///////////////////////////////////////
@@ -231,25 +240,66 @@ function getJson(endpoint) {
     });
 }
 /**
+ * Makes query arg string from addedTranslations. 
+ * 
+ * If addedTranslations = [{'id':1, 'label':'first'}, {'id':2, 'label':'second'}]
+ * then it will return "&translation_id=1&translation_id=2"
+ * 
+ * @returns {String}
+ */
+function getTranslationsQueryString() {
+    returnString = "";
+    addedTranslations.forEach(obj => {
+        returnString += `&translation_id=${obj['id']}`;
+    });
+    return returnString;
+}
+/**
+ * 
+ * @param {Array<int>} translation_ids 
+ * @param {String} mode 
+ */
+function updateBookSelect() {
+    if (addedTranslations.length == 0) {
+        wipeOptions(bookSelect, disable=true);
+        return;
+    }
+    selectLoadingState(bookSelect);
+
+    mode = document.querySelector("input[name=verse_filtering_mode]:checked").value;
+    getJson(`/api/get/book_ids?mode=${mode}${getTranslationsQueryString()}`)
+    .then((json) => {
+        wipeOptions(bookSelect);
+        for (let i = 0; i < json['books'].length; i++) {
+            addOption(bookSelect, bookAbbriviations[json['books'][i]], json['books'][i]);
+        }
+        bookSelect.removeAttribute('disabled');
+    })
+    .catch((error) => {
+        displayInfoBox(verseErrorBox, `Could not fetch books: ${error}`, 'error');
+        errorSelect(bookSelect);
+    });
+}
+/**
  * Gets ids of chapters by book id from api, populates chapter select with chapter id options.
  * @param {any} book_id id of a book. Integer or string
  */
 function updateChapterSelect(book_id) {
     selectLoadingState(chapterSelect);
 
-    getJson(`/api/get/chapter_ids?book_id=${book_id}`)
+    mode = document.querySelector("input[name=verse_filtering_mode]:checked").value;
+    getJson(`/api/get/chapter_ids?mode=${mode}&book_id=${book_id}${getTranslationsQueryString()}`)
     .then((json) => {
         wipeOptions(chapterSelect);
         for (let i = 0; i < json['chapters'].length; i++) {
             addOption(chapterSelect, json['chapters'][i], json['chapters'][i]);
         }
+        chapterSelect.removeAttribute('disabled');
     })
     .catch((error) => {
         displayInfoBox(verseErrorBox, `Could not fetch chapters: ${error}`, 'error');
         errorSelect(chapterSelect);
     });
-
-    chapterSelect.removeAttribute('disabled');
 }
 /**
  * Gets ids of verses by book id and chapter id from api, populates verse select with verse id options.
@@ -259,19 +309,19 @@ function updateChapterSelect(book_id) {
 function updateVerseSelect(book_id, chapter_id) {
     selectLoadingState(verseSelect);
 
-    getJson(`/api/get/verse_ids?book_id=${book_id}&chapter_id=${chapter_id}`)
+    mode = document.querySelector("input[name=verse_filtering_mode]:checked").value;
+    getJson(`/api/get/verse_ids?mode=${mode}&book_id=${book_id}&chapter_id=${chapter_id}${getTranslationsQueryString()}`)
     .then((json) => {
         wipeOptions(verseSelect);
         for (let i = 0; i < json['verses'].length; i++) {
             addOption(verseSelect, json['verses'][i], json['verses'][i]);
         }
+        verseSelect.removeAttribute('disabled');
     })
     .catch((error) => {
         displayInfoBox(verseErrorBox, `Could not fetch verses: ${error}`, 'error');
         errorSelect(verseSelect);
     });
-
-    verseSelect.removeAttribute('disabled');
 }
 /**
  * Gets translations by lang format and by lang from api, populates translation select with translation options.
@@ -374,6 +424,18 @@ function getTranslationMeta(translation_id) {
     .catch((error) => {
         displayInfoBox(globalErrorBox, `Could not fetch translation meta: ${error}`, 'error');
     });
+}
+
+/////////////////////////////
+// --- Verse filtering --- //
+/////////////////////////////
+/**
+ * This function should be called every time addedTranslations list is changed or if verseFilteringMode is changed
+ */
+function updateAllVerseSelects() {
+    updateBookSelect();
+    wipeOptions(chapterSelect, disable_menu=true);
+    wipeOptions(verseSelect, disable_menu=true);
 }
 
 /////////////////////////////////////////
@@ -502,6 +564,7 @@ function addTranslation() {
     addedTranslations.push(objToAdd);
     updateTranslationTags();
     updateRequestTextBox();
+    updateAllVerseSelects();
 }
 
 ///////////////////////////
@@ -549,6 +612,7 @@ function updateTranslationTags() {
             addedTranslations.splice(index, 1);
             updateTranslationTags();
             updateRequestTextBox();
+            updateAllVerseSelects();
         };
         let tag = createTag(label, deleteCallback);
 

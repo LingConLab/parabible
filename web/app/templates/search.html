@@ -7,49 +7,8 @@
     <div id="global_error_box" class="alert alert-danger text-break d-none" role="alert">
       Global page error box.
     </div>
-    <!-- VERSE CONTAINER -->
-    <div class="container col">
-      <!-- Title -->
-      <div class="container">
-        <h4>Choose verses <a title="'Add verse' may be pressed only after verse number is selected." style="cursor: help;">&#9432;</a></h4>
-      </div>
-      <!-- Book select -->
-      <div class="container">
-        <label for="book">Book:</label>
-        <select class="form-select" name="book" id="book_select">
-          <option disabled selected value> -- select an option -- </option>
-          {% for b_id in book_ids %}
-            <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <!-- Chapter select -->
-      <div class="container">
-        <label for="chapter">Chapter:</label>
-        <select class="form-select" name="chapter" id="chapter_select" disabled="disabled">
-          <option disabled selected value> -- select an option -- </option>
-        </select>
-      </div>
-      <!-- Verse select -->
-      <div class="container">
-        <label for="varse">Verse:</label>
-        <select class="form-select" name="verse" id="verse_select" disabled="disabled">
-          <option disabled selected value> -- select an option -- </option>
-        </select>
-      </div>
-      <!-- Verse add button -->
-      <div class="container py-1">
-        <button id="add_verse_btn" disabled onclick="addVerse();" class="btn btn-primary">Add verse</button>
-      </div>
-      <!-- Error box -->
-      <div id="verse_error_box" class="alert alert-danger text-break d-none" role="alert">
-        Verse block error box.
-      </div>
-      <!-- Verse tags -->
-      <div id="verse_tag_box" class="container py-2"></div>
-    </div>
     <!-- TRANSLATION CONTAINER -->
-    <div class="container col">
+    <div class="container col" id="translation_container">
       <!-- Title -->
       <div class="container">
         <h4>Choose translations <a title="'Add translation' may be pressed after translation is selected." style="cursor: help;">&#9432;</a></h4>
@@ -68,14 +27,14 @@
       <div class="container">
         <label for="book">Language:</label>
         <select class="form-select" name="lang" id="lang_select" disabled="disabled">
-          <option disabled selected value> -- select an option -- </option>
+          <option disabled selected value> -- select a format first -- </option>
         </select>
       </div>
       <!-- Translation select -->
       <div class="container">
         <label for="book">Translation:</label>
         <select class="form-select" name="translation" id="translation_select" disabled="disabled">
-          <option disabled selected value> -- select an option -- </option>
+          <option disabled selected value> -- select a language first -- </option>
         </select>
       </div>
       <!-- Translation add button -->
@@ -88,6 +47,65 @@
       </div>
       <!-- Translation tags -->
       <div id="verse_translations_box" class="container py-2"></div>
+    </div>
+    <!-- VERSE CONTAINER -->
+    <div class="container col" id="verse_container">
+      <!-- Title -->
+      <div class="container">
+        <h4>Choose verses <a title="'Add verse' may be pressed only after verse number is selected." style="cursor: help;">&#9432;</a></h4>
+      </div>
+      <!-- Book select -->
+      <div class="container">
+        <label for="book">Book:</label>
+        <select class="form-select" name="book" id="book_select" disabled="disabled">
+          <option disabled selected value> -- add a translation first -- </option>
+          {% for b_id in book_ids %}
+            <option value="{{ b_id[0] }}">{{ b_id[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <!-- Chapter select -->
+      <div class="container">
+        <label for="chapter">Chapter:</label>
+        <select class="form-select" name="chapter" id="chapter_select" disabled="disabled">
+          <option disabled selected value> -- select a book first -- </option>
+        </select>
+      </div>
+      <!-- Verse select -->
+      <div class="container">
+        <label for="varse">Verse:</label>
+        <select class="form-select" name="verse" id="verse_select" disabled="disabled">
+          <option disabled selected value> -- select a chapter first -- </option>
+        </select>
+      </div>
+      <!-- Verse add button -->
+      <div class="container py-1">
+        <button id="add_verse_btn" disabled onclick="addVerse();" class="btn btn-primary">Add verse</button>
+      </div>
+      <!-- Verse filtering mode -->
+      <div class="container">
+        <p class="m-0">Show options that are translated in </p>
+        <div class="container">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" value="all" name="verse_filtering_mode" id="verse_filtering_mode_all" checked>
+            <label class="form-check-label" for="verse_filtering_mode_all">
+              ALL selected translations
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" value="any" name="verse_filtering_mode" id="verse_filtering_mode_any">
+            <label class="form-check-label" for="verse_filtering_mode_any">
+              at least ONE selected translation
+            </label>
+          </div>
+        </div>
+      </div>
+      <!-- Error box -->
+      <div id="verse_error_box" class="alert alert-danger text-break d-none" role="alert">
+        Verse block error box.
+      </div>
+      <!-- Verse tags -->
+      <div id="verse_tag_box" class="container py-2"></div>
     </div>
     <!-- RAW REQUEST CONTAINER -->
     <div class="container col">

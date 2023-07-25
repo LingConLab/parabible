@@ -6,6 +6,6 @@ language_format_options = {
         'frontend_name': 'ISO 15924'
     }, 
     'lang_name': {
-        'frontend_name': 'Literal language name'
+        'frontend_name': 'Language name'
     }
 }

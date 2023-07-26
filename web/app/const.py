@@ -1,3 +1,5 @@
+default_lang ='ru'
+
 language_format_options = {
     'closest_iso_639_3': {
         'en': 'Closest ISO 639-3',

@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 def index():
     return render_template(
         "home.html",
-        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else 'ru',
+        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else const.default_lang,
         translation_base = const.translations_base,
         translation = const.translations_home
     )
@@ -24,7 +24,7 @@ def library():
     book_ids_with_names = [ (x, file_data.get_book_title(x)) for x in book_ids ]
     return render_template(
         "search.html",
-        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else 'ru',
+        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else const.default_lang,
         translation_base = const.translations_base,
         translation = const.translations_search,
         book_ids = book_ids_with_names,

@@ -4,18 +4,16 @@
     <div class="row">
         <div class="col-md-2">
             <ul  id="main_list" class="list-group">
-                <a href="#about" class="list-group-item active">About ParaBible</a>
-                <a href="#usage" class="list-group-item">How to use</a>
+                <a href="#about" class="list-group-item active">{{ translation["about_label"][lang_cookie] }}</a>
+                <a href="#usage" class="list-group-item">{{ translation["howtouse_label"][lang_cookie] }}</a>
             </ul>
         </div>
         <div data-spy="scroll" data-target="#main_list" class="col-md-6">
-            <h1 id="about">About us</h1>
-            <p>Parabible is a parallel corpus containing 1800+ bible translations. Right now it is in early development stage.</p>
+            <h1 id="about">{{ translation["about_label"][lang_cookie] }}</h1>
+            <p>{{ translation["about_text"][lang_cookie] }}</p>
             <br>
-            <h1 id="usage">How to use?</h1>
-            <p>
-                Click 'Search' button on the top to start using this corpus.
-            </p>
+            <h1 id="usage">{{ translation["howtouse_label"][lang_cookie] }}</h1>
+            <p>{{ translation["howtouse_text"][lang_cookie] }}</p>
             </div>
     </div>
 </div>

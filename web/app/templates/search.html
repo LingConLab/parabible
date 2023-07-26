@@ -11,35 +11,35 @@
     <div class="container col" id="translation_container">
       <!-- Title -->
       <div class="container">
-        <h4>Choose translations <a title="'Add translation' may be pressed after translation is selected." style="cursor: help;">&#9432;</a></h4>
+        <h4>{{ translation["choose_translations_label"][lang_cookie] }} <a title="{{ translation['choose_translations_hint'][lang_cookie] }}" style="cursor: help;">&#9432;</a></h4>
       </div>
       <!-- Language format select -->
       <div class="container">
-        <label for="book">Language format:</label>
+        <label for="book">{{ translation["language_format_label"][lang_cookie] }}:</label>
         <select class="form-select" name="lang_format" id="lang_format_select">
           <option disabled selected value> -- select an option -- </option>
           {% for format in lang_formats %}
-            <option value="{{ format[0] }}">{{ format[1]['frontend_name'] }}</option>
+            <option value="{{ format[0] }}">{{ format[1][lang_cookie] }}</option>
           {% endfor %}
         </select>
       </div>
       <!-- Language select -->
       <div class="container">
-        <label for="book">Language:</label>
+        <label for="book">{{ translation["language_label"][lang_cookie] }}:</label>
         <select class="form-select" name="lang" id="lang_select" disabled="disabled">
           <option disabled selected value> -- select a format first -- </option>
         </select>
       </div>
       <!-- Translation select -->
       <div class="container">
-        <label for="book">Translation:</label>
+        <label for="book">{{ translation["translation_label"][lang_cookie] }}:</label>
         <select class="form-select" name="translation" id="translation_select" disabled="disabled">
           <option disabled selected value> -- select a language first -- </option>
         </select>
       </div>
       <!-- Translation add button -->
       <div class="container py-1">
-        <button id="add_translation_btn" disabled onclick="addTranslation();" class="btn btn-primary">Add translation</button>
+        <button id="add_translation_btn" disabled onclick="addTranslation();" class="btn btn-primary">{{ translation["add_translation_button_text"][lang_cookie] }}</button>
       </div>
       <!-- Error box -->
       <div id="translation_error_box" class="alert alert-danger text-break d-none" role="alert">
@@ -52,11 +52,11 @@
     <div class="container col" id="verse_container">
       <!-- Title -->
       <div class="container">
-        <h4>Choose verses <a title="'Add verse' may be pressed only after verse number is selected." style="cursor: help;">&#9432;</a></h4>
+        <h4>{{ translation["choose_verses_label"][lang_cookie] }} <a title="{{ translation['choose_verses_hint'][lang_cookie] }}" style="cursor: help;">&#9432;</a></h4>
       </div>
       <!-- Book select -->
       <div class="container">
-        <label for="book">Book:</label>
+        <label for="book">{{ translation["book_label"][lang_cookie] }}:</label>
         <select class="form-select" name="book" id="book_select" disabled="disabled">
           <option disabled selected value> -- add a translation first -- </option>
           {% for b_id in book_ids %}
@@ -66,36 +66,36 @@
       </div>
       <!-- Chapter select -->
       <div class="container">
-        <label for="chapter">Chapter:</label>
+        <label for="chapter">{{ translation["chapter_label"][lang_cookie] }}:</label>
         <select class="form-select" name="chapter" id="chapter_select" disabled="disabled">
           <option disabled selected value> -- select a book first -- </option>
         </select>
       </div>
       <!-- Verse select -->
       <div class="container">
-        <label for="varse">Verse:</label>
+        <label for="varse">{{ translation["verse_label"][lang_cookie] }}:</label>
         <select class="form-select" name="verse" id="verse_select" disabled="disabled">
           <option disabled selected value> -- select a chapter first -- </option>
         </select>
       </div>
       <!-- Verse add button -->
       <div class="container py-1">
-        <button id="add_verse_btn" disabled onclick="addVerse();" class="btn btn-primary">Add verse</button>
+        <button id="add_verse_btn" disabled onclick="addVerse();" class="btn btn-primary">{{ translation["add_verse_button_text"][lang_cookie] }}</button>
       </div>
       <!-- Verse filtering mode -->
       <div class="container">
-        <p class="m-0">Show options that are translated in </p>
+        <p class="m-0">{{ translation["verse_filter_mode_label"][lang_cookie] }}</p>
         <div class="container">
           <div class="form-check">
             <input class="form-check-input" type="radio" value="all" name="verse_filtering_mode" id="verse_filtering_mode_all" checked>
             <label class="form-check-label" for="verse_filtering_mode_all">
-              ALL selected translations
+              {{ translation["verse_filter_mode_all_label"][lang_cookie] }}
             </label>
           </div>
           <div class="form-check">
             <input class="form-check-input" type="radio" value="any" name="verse_filtering_mode" id="verse_filtering_mode_any">
             <label class="form-check-label" for="verse_filtering_mode_any">
-              at least ONE selected translation
+              {{ translation["verse_filter_mode_any_label"][lang_cookie] }}
             </label>
           </div>
         </div>
@@ -109,9 +109,9 @@
     </div>
     <!-- RAW REQUEST CONTAINER -->
     <div class="container col">
-      <h4>Raw request <a title="You can save raw request text and use it here later. Without having to manually add translations and verses" style="cursor: help;">&#9432;</a></h4>
+      <h4>{{ translation["raw_request_label"][lang_cookie] }} <a title="{{ translation['raw_request_hint'][lang_cookie] }}" style="cursor: help;">&#9432;</a></h4>
       <textarea class="smallborder" name="verse_ids_input" rows="8" cols="20" id="request_text_box"></textarea><br>
-      <button class="btn btn-success" onclick="processRawRequest();">Submit</button>
+      <button class="btn btn-success" onclick="processRawRequest();">{{ translation["raw_request_button_text"][lang_cookie] }}</button>
       <!-- Error box -->
       <div id="raw_request_error_box" class="alert alert-danger text-break d-none" role="alert">
         Raw request block error box.

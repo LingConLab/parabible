@@ -51,8 +51,10 @@ class BibleDB():
             except psycopg2.OperationalError as e:
                 logger.debug(f"Failed to connect to the host option {host}\n{e}")
         else:
-            # raise OperationalError exeption
-            self.connect(host_options[0])
+            logger.critical(f"""Failed to connect to the database.
+            Tried to connect to following hosts: {host_options}
+            Port: {self.DB_PORT}
+            Without the connection to the database nothing but static html content will work!""")
 
     def connect(self, host):
         logger.info(f"Connection to {host}:{self.DB_PORT}")

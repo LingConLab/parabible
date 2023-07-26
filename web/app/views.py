@@ -1,5 +1,5 @@
 from .app import app
-from flask import render_template
+from flask import render_template, request
 import logging
 
 from .src.file_handling import file_data
@@ -11,7 +11,12 @@ logger.setLevel(logging.INFO)
 @app.route('/')
 @app.route('/home')
 def index():
-    return render_template("home.html")
+    return render_template(
+        "home.html",
+        lang_cookie = request.cookies.get('lang'),
+        translation_base = const.translations_base,
+        translation = const.translations_home
+    )
 
 @app.route('/search', methods=['get'])
 def library():
@@ -19,6 +24,9 @@ def library():
     book_ids_with_names = [ (x, file_data.get_book_title(x)) for x in book_ids ]
     return render_template(
         "search.html",
+        lang_cookie = request.cookies.get('lang'),
+        translation_base = const.translations_base,
+        translation = const.translations_search,
         book_ids = book_ids_with_names,
         lang_formats = const.language_format_options.items(),
     )

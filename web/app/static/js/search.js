@@ -82,6 +82,12 @@ function displayInfoBox(box, message, type='info') {
 function hideErrorBox(box) {
     box.classList.add('d-none');
 }
+function hideAllErrorBoxes() {
+    hideErrorBox(globalErrorBox);
+    hideErrorBox(verseErrorBox);
+    hideErrorBox(translationErrorBox);
+    hideErrorBox(rawReqestErrorBox);
+}
 ///////////////////////////////////
 // --- Select boxes managing --- //
 ///////////////////////////////////
@@ -782,6 +788,7 @@ function processRawRequest() {
             })
         }
     }
+    hideAllErrorBoxes();
 }
 
 /////////////////////////////////

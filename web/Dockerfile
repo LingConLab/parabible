@@ -1,10 +1,20 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /parabible
 
+RUN apt -y update
+RUN apt -y install libpq-dev \
+&& apt -y install python3-dev \
+&& apt -y install build-essential
+
 COPY requirements.txt requirements.txt
-RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
+
 COPY . .
 
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0" ]
+CMD [ "uwsgi", \
+"--http", "0.0.0.0:5000", \
+"--wsgi-file", "run.py", \
+"--callable", "app", \
+"--processes", "4", "--threads", "2", \
+"--stats", "127.0.0.1:9191" ]

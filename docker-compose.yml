@@ -10,7 +10,7 @@ services:
     build: 
       context: ./postgres
     env_file:
-      - ./postgres/env_file
+      - ./postgres/db.env
     command: -p 5432
     ports:
       - 11398:5432
@@ -33,8 +33,8 @@ services:
       - db_backend
     # !!!
     # COMMENT THIS TO ENABLE
-    #profiles:
-    #  - donotstart
+    profiles:
+      - donotstart
     # !!!
 
   flask-front:
@@ -48,7 +48,7 @@ services:
     build:
       context: ./web
     env_file:
-      - ./web/env_file
+      - ./web/conf.env
     ports:
       - 11399:5000
     networks:

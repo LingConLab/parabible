@@ -8,7 +8,6 @@ import logging
 
 from ._const import NONE_LABEL
 
-logging.basicConfig(format='[%(levelname)s]: %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def check_conn(func):

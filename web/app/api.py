@@ -1,11 +1,15 @@
 from flask import request
+from os import getenv
 
 from .app import app
 from .src.file_handling import file_data
 from .src.dbmanager import BibleDB
-from . import const
+from . import translations
 
-bible_db = BibleDB()
+DEBUG = getenv('PARABIBLE_DEBUG', 'False').lower() in ('true', '1', 't', 'y')
+db_port = getenv('PARABIBLE_DEBUG_DB_PORT') if DEBUG else getenv('PARABIBLE_PROD_DB_PORT')
+
+bible_db = BibleDB(db_port=db_port)
 
 @app.route('/api/get/book_title_abbrs')
 def api_get_book_abbrs():
@@ -167,9 +171,9 @@ def api_get_langs():
     The format of the "val" is stored in "val_format".
     """
     return_d = {}
-    format = request.args.get('format', default=list(const.language_format_options.keys())[0], type=str)
-    if not format in const.language_format_options:
-        format = list(const.language_format_options.keys())[0]
+    format = request.args.get('format', default=list(translations.language_format_options.keys())[0], type=str)
+    if not format in translations.language_format_options:
+        format = list(translations.language_format_options.keys())[0]
           
     if format == 'lang_name':
         lang_list = bible_db.get_langs_list('closest_iso_639_3')

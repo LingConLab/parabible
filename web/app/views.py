@@ -3,7 +3,7 @@ from flask import render_template, request
 import logging
 
 from .src.file_handling import file_data
-from . import const
+from . import translations
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -13,9 +13,9 @@ logger.setLevel(logging.INFO)
 def index():
     return render_template(
         "home.html",
-        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else const.default_lang,
-        translation_base = const.translations_base,
-        translation = const.translations_home
+        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else translations.default_lang,
+        translation_base = translations.translations_base,
+        translation = translations.translations_home
     )
 
 @app.route('/search', methods=['get'])
@@ -24,11 +24,11 @@ def library():
     book_ids_with_names = [ (x, file_data.get_book_title(x)) for x in book_ids ]
     return render_template(
         "search.html",
-        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else const.default_lang,
-        translation_base = const.translations_base,
-        translation = const.translations_search,
+        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else translations.default_lang,
+        translation_base = translations.translations_base,
+        translation = translations.translations_search,
         book_ids = book_ids_with_names,
-        lang_formats = const.language_format_options.items(),
+        lang_formats = translations.language_format_options.items(),
     )
 
 @app.route('/nothing', methods=['get', 'post'])

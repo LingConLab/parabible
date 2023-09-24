@@ -8,7 +8,9 @@ logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-corpus_dir = Path("corpus-txt")
+current_dir: Path = Path(__file__).parent
+corpus_dir = current_dir.joinpath(Path("corpus-txt"))
+env_file = current_dir.joinpath(Path('web/conf.env'))
 
 arg_parser = argparse.ArgumentParser(
     description = 'Fills the DB with bible texts.',
@@ -25,7 +27,7 @@ arg_parser.add_argument(
 )
 arg_parser.add_argument(
     '-p', '--db_port',
-    default="5432",
+    default=None,
     help='Specify database port'
 )
 args = arg_parser.parse_args()
@@ -69,13 +71,18 @@ def unzip(file_name):
 
 def parse():
     """Connects to the DB and parses extracted content there."""
+    from dotenv import load_dotenv, find_dotenv
+    from os import getenv, system
     from web.app.src.dbmanager import BibleDB
     from web.app.src.dbmanager.parser import parser as db_parser
 
     logger.info(f"Parsing .txt files into DB...")
 
+    load_dotenv(env_file)
+    db_port = getenv('PARABIBLE_DEBUG_DB_PORT') if not args.db_port else args.db_port
+
     try:
-        local_bible_db = BibleDB(db_port=args.db_port)
+        local_bible_db = BibleDB(db_port=db_port)
     except OperationalError as e:
         logger.error(e)
         logger.error("Cant connect to the database. Is postgres DB up?")
@@ -93,7 +100,12 @@ def parse():
         local_bible_db.insert_new_text(text_data)
     
     local_bible_db.conn.commit()
-    logger.info(f"Done! All data was copied to the database. You may now delete the *_pb_corpus.zip file and {corpus_dir} folder.")
+    logger.info(f"Done! All data was copied to the database. You may now delete the *_pb_corpus.zip file and {corpus_dir} folder if its still present.")
+    logger.info(f"Removing {corpus_dir}...")
+    if system(f"rm -r {corpus_dir}") == 0:
+        logger.info(f"Temporary corpus dir was removed.")
+    else:
+        logger.error(f"Failed to remove temporary {corpus_dir}. Feel free to remove it")
 
 if __name__ == "__main__":
     file_name = get_zip()

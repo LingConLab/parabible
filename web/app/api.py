@@ -1,15 +1,11 @@
 from flask import request
-from os import getenv
 
 from .app import app
 from .src.file_handling import file_data
 from .src.dbmanager import BibleDB
 from . import translations
 
-DEBUG = getenv('PARABIBLE_DEBUG', 'False').lower() in ('true', '1', 't', 'y')
-db_port = getenv('PARABIBLE_DEBUG_DB_PORT') if DEBUG else getenv('PARABIBLE_PROD_DB_PORT')
-
-bible_db = BibleDB(db_port=db_port)
+bible_db = BibleDB()
 
 @app.route('/api/get/book_title_abbrs')
 def api_get_book_abbrs():
@@ -217,8 +213,8 @@ def api_get_translations():
     lang = request.args.get('lang', default=None, type=str)
     if not lang or not format:
         return f"<h1>Error 400</h1> 'lang' and 'format' arguments are both required", 400
-    if not format in const.language_format_options:
-        format = list(const.language_format_options.keys())[0]
+    if not format in translations.language_format_options:
+        format = list(translations.language_format_options.keys())[0]
         
     return_d['translations_list'] = bible_db.get_text_list(format, lang)
 

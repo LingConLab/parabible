@@ -4,6 +4,7 @@ from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
 from typing import Literal
 from collections import defaultdict
+from os import getenv
 import logging
 
 from ._const import NONE_LABEL
@@ -27,42 +28,66 @@ def check_conn(func):
     return wrapped
 
 class BibleDB():
-    def __init__(self, host_options: list = None, db_port: str = "5432") -> None:
+    def __init__(self, host_options: list = None, db_port_options: list = None) -> None:
         """Initializates connection and creates tables if dont exist"""
-
         if not host_options:
             host_options = []
-
+        host_options.append('db')
         host_options.append('0.0.0.0')
         host_options.append('localhost')
-        host_options.append('db')
+
+        if not db_port_options:
+            db_port_options = []
+        db_port_options.append(getenv('PARABIBLE_DB_PORT_1'))
+        db_port_options.append(getenv('PARABIBLE_DB_PORT_2'))
         
         self.DB_NAME = "parabible"
         self.DB_USER = "dev"
         self.DB_PASS = "dev"
-        self.DB_PORT = db_port
 
+        stop = False
         for host in host_options:
-            try:
-                self.conn = self.connect(host)
-                logger.info(f"Connected to host {host}")
-                break
-            except psycopg2.OperationalError as e:
-                logger.debug(f"Failed to connect to the host option {host}\n{e}")
+            if stop: break
+            for port in db_port_options:
+                if stop: break
+                try:
+                    self.conn = self.connect(
+                        db_name=self.DB_NAME,
+                        user_name=self.DB_USER,
+                        user_pass=self.DB_PASS,
+                        host=host,
+                        db_port=port
+                    )
+                    logger.info(f"Connected to {host}:{port}")
+                    stop = True
+                except psycopg2.OperationalError as e:
+                    logger.debug(f"Failed to connect to the host option {host}\n{e}")
         else:
             logger.critical(f"""Failed to connect to the database.
             Tried to connect to following hosts: {host_options}
-            Port: {self.DB_PORT}
+            Port with following ports: {db_port_options}
             Without the connection to the database nothing but static html content will work!""")
+            for host in host_options:
+                for port in db_port_options:
+                    try:
+                        self.connect(
+                            db_name=self.DB_NAME,
+                            user_name=self.DB_USER,
+                            user_pass=self.DB_PASS,
+                            host=host,
+                            db_port=port
+                        )
+                    except psycopg2.OperationalError as e:
+                        logger.critical(f"{host}:{port} exeption:\n{e}")
 
-    def connect(self, host):
-        logger.info(f"Connection to {host}:{self.DB_PORT}")
+    def connect(self, db_name, user_name, user_pass, host, db_port):
+        logger.info(f"Connection to {host}:{db_port}")
         return psycopg2.connect(
-            database        =   self.DB_NAME,
-            user            =   self.DB_USER,
-            password        =   self.DB_PASS,
+            database        =   db_name,
+            user            =   user_name,
+            password        =   user_pass,
             host            =   host,
-            port            =   self.DB_PORT,
+            port            =   db_port,
             connect_timeout =   5
         )
     

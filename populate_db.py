@@ -82,7 +82,7 @@ def parse():
     db_port = getenv('PARABIBLE_DEBUG_DB_PORT') if not args.db_port else args.db_port
 
     try:
-        local_bible_db = BibleDB(db_port=db_port)
+        local_bible_db = BibleDB()
     except OperationalError as e:
         logger.error(e)
         logger.error("Cant connect to the database. Is postgres DB up?")

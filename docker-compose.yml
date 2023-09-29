@@ -37,7 +37,7 @@ services:
       - donotstart
     # !!!
 
-  flask-front:
+  front:
     image: parabible-flask
     cpus: 0.2
     mem_limit: 256m

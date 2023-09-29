@@ -1,9 +1,8 @@
 ////////////////////////////
 // --- Initialisation --- //
 ////////////////////////////
-
-const rootEndPoint = "/nginx_root/parabible";
-//const rootEndPoint = "";
+const endPointRegex = /https{0,1}:\/\/[^\/]*(.*)\/search/i;
+const rootEndPoint = window.location.href.match(endPointRegex)[1];
 const host = window.location.protocol + "//" + window.location.host + rootEndPoint;
 // Verse selection containers
 const bookSelect = document.querySelector('#book_select');
@@ -235,9 +234,9 @@ function getJson(endpoint) {
     .then((response) => {
         if (!response.ok)
             return response.text().then(text => { 
-                let notFoundHint = `Make sure that the site is hosted on "${host}"
-                and most importantly that site's root endpoint is "${rootEndPoint}".
-                If root endpoint is different, set the correct root to \`rootEndPoint\` variable in search.js`;
+                let notFoundHint = `Front failed resolving site root path. Contact the developer. Info:
+                Host: "${host}";
+                Root endpoint: "${rootEndPoint}"` 
                 notFoundHint = `[ !!! 404 HINT !!! ] ${notFoundHint}`;
                 if (response.status != 404) notFoundHint = "";
                 throw new Error(`Request url: ${url}\nHTTP error:\n${text}${notFoundHint}`); 

@@ -3,12 +3,18 @@ Consists of a flask python app and a postresql database. They exist in two diffe
 
 For a quick start run these:
 <pre>
-pip3 install wget tqdm psycopg2
-docker compose up db -d
-python3 populate_db.py -m full -p [database_port_here*]
+docker compose up db
+
+// here wait till you see "database system is ready to accept connections" for the second time. This means db is set up. (It says it one time, then runs init scripts, then restarts and tells it for the second time)
+// then stop the container, press (Ctrl + C) one time
+
 docker compose up -d
+pip3 install -r requirements.txt
+
+// Now we run population script. This will download the corpus and put it to the database. `full` mode puts all ~1800 translations (takes >1h). `debug` mode puts just 10 translations (takes <1min)
+
+python3 populate_db.py -m full
 </pre>
- \*you can find db port in [docker-compose.yml](docker-compose.yml) in `db` service. You will see ports: - port1:port2. You need port1, the first one.
 
 # Overview
 

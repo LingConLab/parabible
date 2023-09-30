@@ -1,0 +1,5 @@
+python-dotenv
+flask
+psycopg2-binary
+wget
+tqdm

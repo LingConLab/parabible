@@ -46,6 +46,7 @@ class BibleDB():
         self.DB_PASS = "dev"
 
         stop = False
+        self.conn = None
         for host in host_options:
             if stop: break
             for port in db_port_options:

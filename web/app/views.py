@@ -18,8 +18,17 @@ def index():
         translation = translations.translations_home
     )
 
+@app.route('/how_to_use')
+def how_to_use():
+    return render_template(
+        "how_to_use.html",
+        lang_cookie = request.cookies.get('lang') if request.cookies.get('lang') else translations.default_lang,
+        translation_base = translations.translations_base,
+        translation = translations.translations_how_to_use
+    )
+
 @app.route('/search', methods=['get'])
-def library():
+def search():
     book_ids = file_data.get_book_ids()
     book_ids_with_names = [ (x, file_data.get_book_title(x)) for x in book_ids ]
     return render_template(

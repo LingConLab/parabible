@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-3">
+    <p class="h3">
+        {{ translation["h_1"][lang_cookie] }}
+    </p>
+    <p>
+        {{ translation["p_1_1"][lang_cookie] }} 
+        <a href="{{ url_for("search") }}">{{ translation["a_search_page"][lang_cookie] }}</a>
+        {{ translation["p_1_2"][lang_cookie] }}
+    </p>
+    <ol>
+        <li> {{ translation["li_translation_adding_1"][lang_cookie] }} 
+            <ol>
+                <li> {{ translation["li_translation_adding_subitem_1"][lang_cookie] }} </li>
+                <li> {{ translation["li_translation_adding_subitem_2"][lang_cookie] }} </li>
+                <li> {{ translation["li_translation_adding_subitem_3"][lang_cookie] }} </li>
+                <li> {{ translation["li_translation_adding_subitem_4"][lang_cookie] }} </li>
+            </ol>
+            <p>{{ translation["li_translation_adding_2"][lang_cookie] }}</p>
+        </li>
+        <li> {{ translation["li_verse_adding_1"][lang_cookie] }} 
+            <ol>
+                <li> {{ translation["li_verse_adding_subitem_1"][lang_cookie] }} </li>
+                <li> {{ translation["li_verse_adding_subitem_2"][lang_cookie] }} </li>
+                <li> {{ translation["li_verse_adding_subitem_3"][lang_cookie] }} </li>
+                <li> {{ translation["li_verse_adding_subitem_4"][lang_cookie] }} </li>
+            </ol>
+            <p>{{ translation["li_verse_adding_2"][lang_cookie] }}</p>
+            <p>{{ translation["li_verse_adding_3"][lang_cookie] }}</p>
+        </li>
+        <li> {{ translation["li_raw_box"][lang_cookie] }} 
+            <p>{{ translation["p_raw_box_1"][lang_cookie] }}</p>
+            <p>{{ translation["p_raw_box_2"][lang_cookie] }}</p>
+        </li>
+    </ol>
+</div>
+{% endblock %}

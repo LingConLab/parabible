@@ -24,30 +24,15 @@ It consists of 1846 translations which are taken from [cysouw](https://github.co
 
 The latest version is hosted here : http://lingconlab.ru/parabible/
 
-This project is present as 2 (3) connected docker containers.
+This project is present as 2 connected docker containers.
 
  - python flask container
  - postgresql container
- - pgAdmin container (optional)
 
 ## postgres
 *postgres/* Contains docker files and sql schema file for the postgres container.
 
 ## web
 *web/* contains the actual web python flask app and docker files for the python flask container.
-
-## pgadmin
-Optional container to access the database admin panel. It may be disabled/enabled in *compose.yml* file in the `pgAdmin` section:
-<pre>
-pgAdmin:
-
-    ...
-    
-    # !!!
-    # COMMENT THIS TO ENABLE
-    profiles:
-      - donotstart
-    # !!!
-</pre>
 
 ***For the details see readme files in other dirs***

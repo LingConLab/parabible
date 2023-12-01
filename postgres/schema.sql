@@ -25,3 +25,4 @@ CREATE TABLE IF NOT EXISTS verses (
 CREATE INDEX IF NOT EXISTS idx_translation_id ON verses (translation_id);
 CREATE INDEX IF NOT EXISTS idx_book_id ON verses (book_id);
 CREATE INDEX IF NOT EXISTS idx_chapter_id ON verses (chapter_id);
+CREATE INDEX IF NOT EXISTS idx_verse_id ON verses (verse_id);

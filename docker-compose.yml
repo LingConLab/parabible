@@ -3,62 +3,38 @@ version: '3.5'
 services:
   db:
     image: parabible-postgresql
-    cpus: 0.2
-    mem_limit: 256m
-    restart: always
     container_name: parabible-db
+    restart: unless-stopped
     build: 
       context: ./postgres
     env_file:
       - ./postgres/db.env
     command: -p 5432
     ports:
-      - 11398:5432
+      - ${DB_PORT}:5432
     networks:
       - db_backend
-    
-  pgAdmin:
-    image: dpage/pgadmin4
-    cpus: 0.35
-    mem_limit: 512m
-    restart: always
-    container_name: parabible-pgAdmin
-    env_file:
-      - ./postgres/env_file
-    depends_on:
-      - db
-    ports: 
-      - 11397:80
-    networks:
-      - db_backend
-    # !!!
-    # COMMENT THIS TO ENABLE
-    profiles:
-      - donotstart
-    # !!!
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 600s
+      timeout: 5s
+      retries: 5
 
   front:
     image: parabible-flask
-    cpus: 0.2
-    mem_limit: 256m
-    restart: always
     container_name: parabible-front
+    restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     build:
       context: ./web
     env_file:
       - ./web/conf.env
     ports:
-      - 11399:5000
+      - ${PY_PORT}:5000
     networks:
       - db_backend
-
-    # !!!
-    # COMMENT THIS TO ENABLE
-    #profiles:
-    #  - donotstart
-    # !!!
 
 networks:
   db_backend:

@@ -2,6 +2,7 @@ tsa/
 .vscode/
 corpus-txt/
 .venv/
+venv/
 books_structure.json
 
 *.zip

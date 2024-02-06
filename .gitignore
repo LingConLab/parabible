@@ -1,9 +1,14 @@
 tsa/
 .vscode/
 corpus-txt/
+corpus/
+script_data/
 .venv/
 venv/
 books_structure.json
 
 *.zip
+*.tar
+*.xz
+*.gz
 *.pyc

@@ -2,12 +2,15 @@ import psycopg2
 from typing import List, Dict, Tuple, Union
 from psycopg2.extras import RealDictCursor, DictCursor
 from psycopg2.extensions import AsIs
+from dotenv import load_dotenv, find_dotenv
 from typing import Literal
 from collections import defaultdict
 from os import getenv
 import logging
 
 from ._const import NONE_LABEL
+
+load_dotenv(find_dotenv('conf.env'))
 
 logger = logging.getLogger(__name__)
 

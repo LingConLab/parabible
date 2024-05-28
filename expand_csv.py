@@ -10,9 +10,9 @@ logger.setLevel(logging.INFO)
 from web.app.src.dbmanager import BibleDB
 
 csv_input = Path('./script_data/Шаблон.csv')
-new_lang_name = 'Armenian'
-translation_id = 1343
-csv_output = Path(f'./script_data/{new_lang_name}_{translation_id}.csv')
+new_lang_name = 'Aghul'
+translation_id = 546
+csv_output = Path(f'./script_data/{new_lang_name}_{translation_id}.csv'.replace(' ', '_'))
 book_ids = {
     'Мф': 40,   # Matthew
     'Мк': 41,   # Mark

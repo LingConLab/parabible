@@ -1,8 +1,8 @@
 from pathlib import Path
+from typing import List
 from time import sleep
 from tqdm import tqdm
 import logging
-import json
 import csv
 
 logging.basicConfig(format='[%(levelname)s]:\t%(message)s', level=logging.INFO)
@@ -15,10 +15,10 @@ from web.app.src.file_handling import file_data
 def get_book_abbrivs() -> dict:
     return file_data.get_book_abbrivs()
 
-def get_chapters(db: BibleDB, translation_id: int, book_id: int) -> list[int]:
+def get_chapters(db: BibleDB, translation_id: int, book_id: int) -> List[int]:
     return db.get_chapters(translation_id, book_id)
 
-def get_verses(db: BibleDB, translation_id: int, book_id: int, chapter: int) -> list[int]:
+def get_verses(db: BibleDB, translation_id: int, book_id: int, chapter: int) -> List[int]:
     return db.get_verse_ids(translation_id, book_id, chapter)
 
 def get_verse_text(db: BibleDB, translation_id: int, book_id: int, chapter: int, verse: int) -> str:

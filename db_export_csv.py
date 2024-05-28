@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import List
-from time import sleep
 from tqdm import tqdm
 import logging
 import csv
@@ -50,7 +49,6 @@ def main():
                     verse_text = get_verse_text(db, TRANS_ID, book_id, ch, v)
                     verse_tag = form_verse_tag(abbrivs, book_id, ch, v)
                     writer.writerow((verse_tag, verse_text))
-                    sleep(0.2)
 
 if __name__ == "__main__":
     main()
